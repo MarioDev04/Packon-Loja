@@ -1,26 +1,42 @@
 .heroSection {
   position: relative;
-  min-height: 100vh;
+  /* Garante que ocupe exatos 100% da altura da viewport visível */
+  height: 100dvh; /* dvh lida melhor com barras de navegador mobile/desktop */
+  min-height: 650px; /* Trava de segurança para telas muito baixas não esmagarem tudo */
+  width: 100%;
+  
   background-color: #020202;
   color: white;
+  
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  
+  /* O PULO DO GATO: Distribuição inteligente */
+  /* Em vez de justify-content: center, usamos space-evenly ou distribuímos com margins auto */
+  justify-content: center; 
+  
   overflow: hidden;
-  padding-top: 100px;
+  
+  /* Padding superior para compensar o Header Fixo (ajuste conforme a altura do seu header) */
+  padding-top: 80px; 
 }
 
 .content {
   text-align: center;
-  margin: 4rem 0 2rem 0;
   z-index: 10;
   padding: 0 1rem;
   position: relative;
+  
+  /* Margens dinâmicas baseadas na altura da tela */
+  margin-top: 10vh;
+  margin-bottom: 2vh;
+  flex-shrink: 0; /* Impede que o texto seja esmagado se faltar espaço */
 }
 
 .title {
-  font-size: 5rem;
+  /* CLAMP: Mínimo 3rem, Ideal 6vw, Máximo 5rem */
+  font-size: clamp(3rem, 6vw, 5rem);
   line-height: 1.1;
   font-weight: 400;
   margin-bottom: 1rem;
@@ -30,7 +46,7 @@
 }
 
 .subtitle {
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
   color: #b1b1b1;
   max-width: 600px;
   margin: 0 auto;
@@ -39,11 +55,16 @@
 
 .carouselContainer {
   width: 100vw;
-  height: 350px; /* Aumentei a altura pois os cards são maiores */
+  /* Altura fixa é necessária para a matemática do 3D, 
+     mas vamos ajustar a escala nas media queries se precisar */
+  height: 350px; 
   position: relative;
   display: flex;
   justify-content: center;
-  perspective: 1000px; /* Mantém a profundidade perfeita */
+  perspective: 1000px;
+  
+  /* Margem dinâmica para afastar do texto e do botão proporcionalmente */
+  margin: 2vh 0 3vh 0;
 }
 
 .cardsWrapper {
@@ -54,8 +75,8 @@
 }
 
 .card {
-  width: 280px; /* AUMENTADO (era 200px) */
-  height: 400px; /* AUMENTADO (proporcional) */
+  width: 280px; 
+  height: 400px; 
   position: absolute;
   left: 0;
   top: 50%;
@@ -66,6 +87,9 @@
   will-change: transform;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  
+  /* Sombra suave para destacar do fundo preto */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .cardImage {
@@ -76,7 +100,8 @@
 }
 
 .ctaButton {
-  margin-top: 2rem;
+  /* Margem inferior dinâmica */
+  margin-bottom: 5vh;
   padding: 0.8rem 3rem;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.3);
@@ -97,3 +122,44 @@
   border-color: white;
 }
 
+/* --- MEDIA QUERIES PARA "RESPONSIVIDADE VERTICAL" --- */
+
+/* Telas com altura pequena (ex: Notebooks 1366x768 ou menores) */
+@media (max-height: 800px) {
+  .heroSection {
+    padding-top: 60px;
+  }
+  
+  /* Reduzimos um pouco a escala do carrossel para caber na tela sem sobrepor */
+  .carouselContainer {
+    height: 300px;
+    transform: scale(0.85); /* Truque visual: diminui tudo proporcionalmente */
+    margin: 0; /* Remove margem extra */
+  }
+
+  .title {
+    margin-bottom: 0.5rem;
+  }
+  
+  .content {
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+  }
+  
+  .ctaButton {
+    margin-bottom: 3vh;
+  }
+}
+
+/* Telas MUITO pequenas na altura (modo paisagem celular ou janelas pequenas) */
+@media (max-height: 600px) {
+  .carouselContainer {
+    transform: scale(0.7);
+  }
+  .heroSection {
+    /* Destrava a altura para permitir scroll se necessário */
+    height: auto; 
+    min-height: 100vh;
+    padding-bottom: 2rem;
+  }
+}

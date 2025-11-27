@@ -1,35 +1,57 @@
 .header {
   position: fixed;
-  top: 3rem; /* Espaço do topo */
-  left: 50%;
+  top: 3rem;
+  left: 50%; /* GSAP cuida do translate(-50%) */
   width: 90%;
   max-width: 1480px;
   height: 80px;
   
-  /* O Segredo do Glassmorphism */
-  background: rgba(20, 20, 20, 0.6); /* Fundo escuro semi-transparente */
-  backdrop-filter: blur(12px); /* O desfoque do que passa atrás */
-
+  /* Glassmorphism Reforçado (Safari/Chrome/Firefox) */
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(12px);
   
-  border-radius: 9999px; /* Pill shape (canto totalmente arredondado) */
+  border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 4rem;
-  z-index: 100; /* Sempre acima */
+  
+  /* Clamp no padding lateral:
+     Min: 1.5rem (celular/tablet)
+     Ideal: 4vw
+     Max: 4rem (seu design original) */
+  padding: 0 clamp(1.5rem, 4vw, 4rem);
+  
+  z-index: 100;
   color: white;
   transition: background 0.3s ease;
+  
+  /* Estados iniciais para o GSAP */
   opacity: 0; 
   visibility: hidden;
 }
 
-.logo img {
-  width: 100px;
+/* Wrapper para o Next/Image funcionar com 'fill' */
+.logoLink {
+  display: block;
+  /* Removemos margem padrão de links se houver */
+}
+
+.logoWrapper {
+  position: relative;
+  width: 100px; /* Tamanho do logo mantido */
+  height: 40px; /* Ajuste a altura conforme a proporção real do seu logo */
 }
 
 .nav {
   display: flex;
-  gap: 8rem;
+  align-items: center;
+  /* AQUI ESTÁ A MÁGICA:
+     Ao invés de gap: 8rem fixo (128px), usamos clamp.
+     - Se a tela for gigante: usa 8rem.
+     - Se a tela diminuir: o gap diminui suavemente até 2rem.
+     Isso impede que o menu "estoure" em notebooks.
+  */
+  gap: clamp(2rem, 8vw, 8rem);
 }
 
 .navLink {
@@ -37,7 +59,8 @@
   text-decoration: none;
   font-size: 0.95rem;
   transition: color 0.3s;
-  font-weight: 400;
+  font-weight: 300;
+  white-space: nowrap; /* Garante que 'Quem somos' não quebre em duas linhas */
 }
 
 .navLink:hover {
@@ -50,13 +73,12 @@
   gap: 1.5rem;
 }
 
-/* Input de busca estilo pílula interna */
 .searchContainer {
   display: flex;
   align-items: center;
-  border: 1px solid rgb(255, 255, 255);
+  border: 1px solid rgba(255, 255, 255, 0.8); /* Refinei a cor da borda levemente */
   border-radius: 999px;
-  padding: 0.5rem 1.2rem;
+  padding: 0.4rem 1rem; /* Leve ajuste para centralizar melhor */
 }
 
 .searchInput {
@@ -65,10 +87,36 @@
   color: white;
   outline: none;
   font-size: 0.85rem;
-  width: 200px;
+  width: 180px; /* Levemente reduzido para segurança em telas médias */
+  padding-right: 0.5rem;
 }
 
-.icon {
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Botões invisíveis apenas para resetar estilos de button */
+.iconButton, .cartButton {
+  background: none;
+  border: none;
   cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.iconButton:hover {
+  transform: scale(1.1);
+}
+
+.cartButton:hover {
+  color: #a5a5a5;
+  transform: scale(1.05);
+}
+
+.cartIcon {
   color: #fff;
 }

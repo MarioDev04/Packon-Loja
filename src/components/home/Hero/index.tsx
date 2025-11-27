@@ -38,11 +38,11 @@ export default function Hero() {
     if (titleRef.current && subtitleRef.current && carouselContainerRef.current && buttonRef.current) {
         
         tl.from(titleRef.current, {
-          y: 50,
+          y: 50, // Pode reduzir um pouco o Y já que o layout é mais apertado
           opacity: 0,
           filter: "blur(10px)",
           duration: 1,
-          delay: 0.5 // Espera o Header descer um pouco
+          delay: 0.2 // Reduzi o delay inicial para ser mais ágil
         })
         .from(subtitleRef.current, {
           y: 30,

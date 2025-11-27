@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { Search, ShoppingCart } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image"; // Importando Image otimizado
 import styles from "./header.module.css";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -11,20 +12,16 @@ export default function Header() {
   const headerRef = useRef<HTMLElement>(null);
 
   useGSAP(() => {
-    // 1. Definição Inicial (Set):
-    // Garante que o elemento esteja centralizado horizontalmente (xPercent: -50)
-    // E invisível/acima da tela antes de começar
+    // Mantive sua lógica GSAP original pois ela está correta para centralização
     gsap.set(headerRef.current, {
-      xPercent: -50, // Substitui o translateX(-50%) do CSS
-      y: -150,       // Sobe 150px (fora da tela)
-      autoAlpha: 0   // Opacity: 0 + Visibility: hidden (evita bugs de clique)
+      xPercent: -50,
+      y: -150,
+      autoAlpha: 0 
     });
 
-    // 2. Animação (To):
-    // Desce para a posição original (y: 0) mantendo o centro
     gsap.to(headerRef.current, {
       y: 0,
-      autoAlpha: 1, // Restaura opacidade e visibilidade
+      autoAlpha: 1,
       duration: 1.2,
       ease: "power4.out",
       delay: 0.2
@@ -33,7 +30,19 @@ export default function Header() {
 
   return (
     <header className={styles.header} ref={headerRef}>
-      <div className={styles.logo}><img src="/logo.png" alt="Logo" /></div>
+      {/* 1. Logo agora é clicável e otimizado */}
+      <Link href="/" className={styles.logoLink}>
+        <div className={styles.logoWrapper}>
+          <Image 
+            src="/logo.png" 
+            alt="Logo Conceito" 
+            fill // Ocupa o wrapper pai
+            priority // Carregamento instantâneo
+            sizes="120px"
+            style={{ objectFit: 'contain' }}
+          />
+        </div>
+      </Link>
       
       <nav className={styles.nav}>
         <Link href="/" className={styles.navLink}>Início</Link>
@@ -44,10 +53,22 @@ export default function Header() {
 
       <div className={styles.actions}>
         <div className={styles.searchContainer}>
-          <input type="text" className={styles.searchInput} />
-          <Search size={18} color="#a1a1a1" />
+          <input 
+            type="text" 
+            className={styles.searchInput} 
+            placeholder="Buscar..." // Boa prática de UX
+            aria-label="Buscar produtos"
+          />
+          <button className={styles.iconButton} aria-label="Pesquisar">
+             <Search size={18} color="#a1a1a1" />
+          </button>
         </div>
-        <ShoppingCart className={styles.icon} size={24} />
+
+        {/* Botão semântico para o carrinho */}
+        <button className={styles.cartButton} aria-label="Carrinho de compras">
+          <ShoppingCart className={styles.cartIcon} size={26} />
+          {/* Opcional: Badge de contagem poderia vir aqui no futuro */}
+        </button>
       </div>
     </header>
   );

@@ -1,5 +1,6 @@
 .section {
-  padding: 8rem 2rem 2rem 2rem;
+  /* Espaçamento responsivo */
+  padding: clamp(4rem, 8vh, 10rem) 2rem;
   background-color: #020202;
   position: relative;
   overflow: hidden;
@@ -7,13 +8,13 @@
 
 .header {
   text-align: center;
-  margin-bottom: 4rem;
+  margin-bottom: clamp(2rem, 5vh, 4rem);
   z-index: 10;
   position: relative;
 }
 
 .title {
-  font-size: 3rem;
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
   color: white;
   font-weight: 400;
 }
@@ -21,10 +22,17 @@
 .container {
   display: flex;
   width: 100%;
-  max-width: 1400px;
-  height: 600px;
+  
+  /* Altura responsiva:
+     - Mínimo: 450px
+     - Ideal: 65% da altura da tela
+     - Máximo: 800px 
+  */
+  height: clamp(450px, 65vh, 800px);
+  
+  max-width: 1500px;
   margin: 0 auto;
-  gap: 1rem;
+  gap: clamp(0.5rem, 1vw, 1.5rem);
 }
 
 .panel {
@@ -33,9 +41,15 @@
   border-radius: 40px;
   overflow: hidden;
   cursor: pointer;
-  flex-grow: 1;
+  
+  /* Flex-grow controlado pelo GSAP, mas definimos o padrão aqui */
+  flex-grow: 1; 
+  
   transition: border-color 0.3s ease;
   will-change: flex-grow;
+  
+  /* Garante que o conteúdo não vaze durante a animação */
+  isolation: isolate; 
 }
 
 .imageWrapper {
@@ -53,13 +67,10 @@
   transition: transform 1s ease;
 }
 
-/* Efeito sutil de zoom na imagem ao ativar */
 .panel.active .bgImage {
   transform: scale(1.05);
 }
 
-/* --- SHADOW INTERNO (O Segredo da Leitura) --- */
-/* Gradiente que escurece o Topo e o Fundo, deixando o meio mais limpo */
 .overlay {
   position: absolute;
   top: 0;
@@ -68,62 +79,58 @@
   height: 100%;
   background: linear-gradient(
     to bottom,
-    rgba(0,0,0,0.9) 0%,   /* Escuro no topo (texto fechado) */
-    rgba(0,0,0,0.1) 100%, 
-    rgba(0,0,0,0.1) 0%, 
-    rgba(0,0,0,0.9) 100%  /* Escuro no fundo (texto aberto) */
+    rgba(0,0,0,0.8) 0%,   
+    rgba(0,0,0,0.2) 50%,
+    rgba(0,0,0,0.8) 100%
   );
   pointer-events: none;
   z-index: 1;
 }
 
-/* --- TEXTO RECOLHIDO (Topo) --- */
-.verticalLabel {
+/* --- O ELEMENTO QUE DANÇA --- */
+.floatingLabel {
   position: absolute;
-  top: 4rem; /* Margem do topo */
-  left: 2rem;
+  /* Define o ponto de partida padrão (estado inativo) */
+  top: 50%;
+  left: 50%;
   
-  /* Escrita Vertical de cima para baixo */
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
+  /* O PULO DO GATO: */
+  /* translate(-50%, -50%) centraliza o ponto de ancoragem. */
+  /* O rotate(-90deg) é o estado inicial padrão (fechado). */
+  transform: translate(-50%, -50%) rotate(-90deg);
   
-  color: rgb(255,255,255);
-  font-size: 2.2rem;
+  color: white;
+  font-size: clamp(1.8rem, 3vw, 3.5rem);
   font-weight: 200;
   white-space: nowrap;
-  pointer-events: none;
-  z-index: 10;
-}
-
-/* --- CONTEÚDO EXPANDIDO (Fundo) --- */
-.expandedContent {
-  position: absolute;
-  top: 3rem;
-  left: 50%;
-  z-index: 20;
-  opacity: 0;
-  transform: translateX(-50%);
-}
-
-.categoryTitle {
-  font-size: 3rem;
-  color: white;
-  font-weight: 200;
   margin: 0;
   line-height: 1;
+  
+  z-index: 20;
+  pointer-events: none;
+  
+  /* IMPORTANTE: Removemos qualquer 'transition' daqui. */
+  /* O GSAP deve ser o único dono do movimento. */
+  will-change: top, transform; 
+  -webkit-font-smoothing: antialiased;
 }
 
+/* --- MOBILE --- */
+@media (max-width: 900px) {
+  .container { 
+    flex-direction: column; 
+    height: auto;
+    min-height: 600px;
+  }
 
-/* Mobile */
-@media (max-width: 768px) {
-  .container { flex-direction: column; height: auto; }
-  .panel { height: 80px; width: 100%; }
-  .panel.active { height: 450px; }
-  .verticalLabel {
-    writing-mode: horizontal-tb;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    text-align: center;
+  .panel { 
+    height: 80px; 
+    width: 100%; 
+    flex-grow: 0 !important; /* GSAP não deve mexer na largura aqui */
+  }
+  
+  /* Quando ativo no mobile, cresce a altura */
+  .panel.active { 
+    height: 450px; 
   }
 }
