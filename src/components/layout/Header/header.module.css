@@ -1,0 +1,74 @@
+.header {
+  position: fixed;
+  top: 3rem; /* Espaço do topo */
+  left: 50%;
+  width: 90%;
+  max-width: 1480px;
+  height: 80px;
+  
+  /* O Segredo do Glassmorphism */
+  background: rgba(20, 20, 20, 0.6); /* Fundo escuro semi-transparente */
+  backdrop-filter: blur(12px); /* O desfoque do que passa atrás */
+
+  
+  border-radius: 9999px; /* Pill shape (canto totalmente arredondado) */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4rem;
+  z-index: 100; /* Sempre acima */
+  color: white;
+  transition: background 0.3s ease;
+  opacity: 0; 
+  visibility: hidden;
+}
+
+.logo img {
+  width: 100px;
+}
+
+.nav {
+  display: flex;
+  gap: 8rem;
+}
+
+.navLink {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.3s;
+  font-weight: 400;
+}
+
+.navLink:hover {
+  color: #a5a5a5;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Input de busca estilo pílula interna */
+.searchContainer {
+  display: flex;
+  align-items: center;
+  border: 1px solid rgb(255, 255, 255);
+  border-radius: 999px;
+  padding: 0.5rem 1.2rem;
+}
+
+.searchInput {
+  background: transparent;
+  border: none;
+  color: white;
+  outline: none;
+  font-size: 0.85rem;
+  width: 200px;
+}
+
+.icon {
+  cursor: pointer;
+  color: #fff;
+}

@@ -1,0 +1,129 @@
+.section {
+  padding: 8rem 2rem 2rem 2rem;
+  background-color: #020202;
+  position: relative;
+  overflow: hidden;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 4rem;
+  z-index: 10;
+  position: relative;
+}
+
+.title {
+  font-size: 3rem;
+  color: white;
+  font-weight: 400;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  max-width: 1400px;
+  height: 600px;
+  margin: 0 auto;
+  gap: 1rem;
+}
+
+.panel {
+  position: relative;
+  height: 100%;
+  border-radius: 40px;
+  overflow: hidden;
+  cursor: pointer;
+  flex-grow: 1;
+  transition: border-color 0.3s ease;
+  will-change: flex-grow;
+}
+
+.imageWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.bgImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1s ease;
+}
+
+/* Efeito sutil de zoom na imagem ao ativar */
+.panel.active .bgImage {
+  transform: scale(1.05);
+}
+
+/* --- SHADOW INTERNO (O Segredo da Leitura) --- */
+/* Gradiente que escurece o Topo e o Fundo, deixando o meio mais limpo */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.9) 0%,   /* Escuro no topo (texto fechado) */
+    rgba(0,0,0,0.1) 100%, 
+    rgba(0,0,0,0.1) 0%, 
+    rgba(0,0,0,0.9) 100%  /* Escuro no fundo (texto aberto) */
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* --- TEXTO RECOLHIDO (Topo) --- */
+.verticalLabel {
+  position: absolute;
+  top: 4rem; /* Margem do topo */
+  left: 2rem;
+  
+  /* Escrita Vertical de cima para baixo */
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  
+  color: rgb(255,255,255);
+  font-size: 2.2rem;
+  font-weight: 200;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* --- CONTEÚDO EXPANDIDO (Fundo) --- */
+.expandedContent {
+  position: absolute;
+  top: 3rem;
+  left: 50%;
+  z-index: 20;
+  opacity: 0;
+  transform: translateX(-50%);
+}
+
+.categoryTitle {
+  font-size: 3rem;
+  color: white;
+  font-weight: 200;
+  margin: 0;
+  line-height: 1;
+}
+
+
+/* Mobile */
+@media (max-width: 768px) {
+  .container { flex-direction: column; height: auto; }
+  .panel { height: 80px; width: 100%; }
+  .panel.active { height: 450px; }
+  .verticalLabel {
+    writing-mode: horizontal-tb;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    text-align: center;
+  }
+}

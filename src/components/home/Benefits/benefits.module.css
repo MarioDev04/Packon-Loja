@@ -1,0 +1,93 @@
+.section {
+  padding: 8rem 2rem 2rem 2rem;
+  background-color: #020202; /* Mantendo a continuidade do fundo */
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 5;
+}
+
+/* Título da Sessão */
+.title {
+  font-size: 3rem;
+  font-weight: 400; /* Regular, não negrito */
+  margin-bottom: 8rem;
+  text-align: center;
+  max-width: 900px;
+  
+}
+
+/* Container dos 3 itens */
+.grid {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 4rem; /* Espaço generoso entre colunas */
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Cada Item (Card) */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1; /* Todos ocupam o mesmo espaço */
+  max-width: 350px;
+}
+
+/* Ícone */
+.iconWrapper {
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Opcional: Um brilho suave atrás do ícone se quiser mais "tchan", 
+     mas a referência é clean, então deixaremos sem fundo */
+}
+
+/* Título do Card */
+.cardTitle {
+  font-size: 2rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+  white-space: nowrap; /* Tenta manter em uma linha se der */
+}
+
+/* Descrição */
+.cardDesc {
+  font-size: 1rem;
+  color: #ccc; /* Cinza claro para contraste */
+  font-weight: 300;
+  line-height: 1.5;
+  max-width: 400px; /* Limita largura para quebrar a linha bonito */
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .grid {
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2.2rem;
+    margin-bottom: 4rem;
+  }
+  
+  .grid {
+    flex-direction: column;
+    align-items: center;
+    gap: 4rem;
+  }
+  
+  .cardTitle {
+    white-space: normal;
+  }
+}
