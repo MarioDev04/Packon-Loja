@@ -149,14 +149,14 @@
     justify-content: center; 
     
     /* 2. Padding de segurança apenas para passar do Header (80px) */
-    padding-top: 150px;
+    padding-top: 170px;
     padding-bottom: 2rem; /* Respiro embaixo */
   }
 
   .content {
     /* 3. Resetamos as margens do desktop para o flexbox centralizar puro */
     margin-top: 0; 
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .title {
