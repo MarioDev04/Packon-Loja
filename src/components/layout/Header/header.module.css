@@ -4,81 +4,180 @@
   left: 50%; /* GSAP cuida do translate(-50%) */
   width: 90%;
   max-width: 1480px;
+  
+  /* Altura inicial fixa, mas o GSAP vai mudar para 'auto' quando abrir */
   height: 80px;
   
-  /* Glassmorphism Reforçado (Safari/Chrome/Firefox) */
+  /* Glassmorphism */
   background: rgba(20, 20, 20, 0.6);
   backdrop-filter: blur(12px);
   
-  border-radius: 9999px;
+  border-radius: 50px;
+  
+  /* Layout Base: Flex Row para Desktop */
   display: flex;
   align-items: center;
   justify-content: space-between;
   
-  /* Clamp no padding lateral:
-     Min: 1.5rem (celular/tablet)
-     Ideal: 4vw
-     Max: 4rem (seu design original) */
+  /* Padding lateral responsivo */
   padding: 0 clamp(1.5rem, 4vw, 4rem);
   
   z-index: 100;
   color: white;
-  transition: background 0.3s ease;
   
-  /* Estados iniciais para o GSAP */
+  /* Importante para a animação de altura funcionar sem vazar conteúdo */
+  overflow: hidden;
+  
+  /* Estados iniciais para o GSAP da entrada */
   opacity: 0; 
   visibility: hidden;
 }
 
-/* Wrapper para o Next/Image funcionar com 'fill' */
+/* Wrapper para alinhar logo e itens no Desktop */
+.topBar {
+    display: flex;
+    align-items: center;
+    /* No mobile, o topBar precisa ocupar a largura para separar Logo e Hamburguer */
+    flex-grow: 0; 
+}
+
 .logoLink {
   display: block;
-  /* Removemos margem padrão de links se houver */
 }
 
 .logoWrapper {
   position: relative;
-  width: 100px; /* Tamanho do logo mantido */
-  height: 40px; /* Ajuste a altura conforme a proporção real do seu logo */
+  width: 100px;
+  height: 40px;
 }
 
-.nav {
+/* --- ELEMENTOS EXCLUSIVOS DESKTOP --- */
+.desktopNav {
   display: flex;
   align-items: center;
-  /* AQUI ESTÁ A MÁGICA:
-     Ao invés de gap: 8rem fixo (128px), usamos clamp.
-     - Se a tela for gigante: usa 8rem.
-     - Se a tela diminuir: o gap diminui suavemente até 2rem.
-     Isso impede que o menu "estoure" em notebooks.
-  */
   gap: clamp(2rem, 8vw, 8rem);
 }
 
+.desktopActions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* --- ELEMENTOS MOBILE (Inicialmente escondidos) --- */
+.hamburger {
+    display: none; /* Escondido no Desktop */
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 20;
+}
+
+.line {
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    border-radius: 2px;
+    transform-origin: center;
+    /* GSAP controla a animação, mas deixamos transition suave se precisar */
+}
+
+.mobileContent {
+    display: none; /* Escondido no Desktop */
+    width: 100%;
+    flex-direction: column;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    gap: 1.5rem;
+}
+
+/* --- ESTILIZAÇÃO DO CONTEÚDO MOBILE --- */
+.mobileSearch {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 50px;
+    width: 100%;
+}
+
+.mobileSearch input {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    width: 100%;
+    outline: none;
+}
+
+.mobileSearch input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.mobileCartBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    background: transparent;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 300;
+    cursor: pointer;
+    border: 0;
+}
+
+.mobileNav {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+}
+
+.mobileNavLink {
+    padding: 1rem 0;
+    font-size: 1.3rem;
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+    transition: color 0.3s;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.mobileNavLink:last-child {
+    border-bottom: none;
+}
+
+.mobileNavLink:hover {
+    color: white;
+}
+
+/* Estilos originais reutilizados */
 .navLink {
   color: #ffffff;
   text-decoration: none;
   font-size: 0.95rem;
   transition: color 0.3s;
   font-weight: 300;
-  white-space: nowrap; /* Garante que 'Quem somos' não quebre em duas linhas */
+  white-space: nowrap;
 }
-
-.navLink:hover {
-  color: #a5a5a5;
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
+.navLink:hover { color: #a5a5a5; }
 
 .searchContainer {
   display: flex;
   align-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.8); /* Refinei a cor da borda levemente */
+  border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 999px;
-  padding: 0.4rem 1rem; /* Leve ajuste para centralizar melhor */
+  padding: 0.4rem 1rem;
 }
 
 .searchInput {
@@ -87,15 +186,11 @@
   color: white;
   outline: none;
   font-size: 0.85rem;
-  width: 180px; /* Levemente reduzido para segurança em telas médias */
+  width: 180px;
   padding-right: 0.5rem;
 }
+.searchInput::placeholder { color: rgba(255, 255, 255, 0.5); }
 
-.searchInput::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-/* Botões invisíveis apenas para resetar estilos de button */
 .iconButton, .cartButton {
   background: none;
   border: none;
@@ -107,16 +202,51 @@
   color: inherit;
   transition: transform 0.2s, color 0.2s;
 }
+.iconButton:hover { transform: scale(1.1); }
+.cartButton:hover { color: #a5a5a5; transform: scale(1.05); }
+.cartIcon { color: #fff; }
 
-.iconButton:hover {
-  transform: scale(1.1);
+
+/* =========================================
+   MEDIA QUERIES (A Mágica acontece aqui)
+   ========================================= */
+
+@media (max-width: 1024px) {
+    .header {
+        /* No mobile, mudamos para coluna para permitir a expansão para baixo */
+        flex-direction: column;
+        align-items: flex-start; /* Alinha tudo à esquerda dentro do container */
+        
+        /* Ajuste do padding para quando estiver expandido */
+        padding: 0 2rem;
+    }
+
+    .logoWrapper {
+      position: relative;
+      width: 100px;
+      height: 40px;
 }
 
-.cartButton:hover {
-  color: #a5a5a5;
-  transform: scale(1.05);
-}
+    .topBar {
+        width: 100%;
+        height: 80px; /* Mantém a altura do header fechado */
+        justify-content: space-between; /* Logo na esq, Hamburguer na dir */
+        flex-shrink: 0; /* Garante que essa barra nunca encolha */
+    }
 
-.cartIcon {
-  color: #fff;
+    /* Esconde os elementos Desktop */
+    .desktopNav, 
+    .desktopActions {
+        display: none;
+    }
+
+    /* Mostra o Hamburger */
+    .hamburger {
+        display: flex;
+    }
+
+    /* Prepara o Mobile Content (display flex, mas opacity 0 controlado pelo GSAP) */
+    .mobileContent {
+        display: flex;
+    }
 }

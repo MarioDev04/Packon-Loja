@@ -1,8 +1,8 @@
 .heroSection {
   position: relative;
-  /* Garante que ocupe exatos 100% da altura da viewport visível */
-  height: 100dvh; /* dvh lida melhor com barras de navegador mobile/desktop */
-  min-height: 650px; /* Trava de segurança para telas muito baixas não esmagarem tudo */
+  /* Altura total da viewport dinâmica */
+  height: 100dvh; 
+  min-height: 650px;
   width: 100%;
   
   background-color: #020202;
@@ -12,13 +12,10 @@
   flex-direction: column;
   align-items: center;
   
-  /* O PULO DO GATO: Distribuição inteligente */
-  /* Em vez de justify-content: center, usamos space-evenly ou distribuímos com margins auto */
+  /* CENTRALIZAÇÃO VERTICAL PADRÃO (Desktop) */
   justify-content: center; 
   
   overflow: hidden;
-  
-  /* Padding superior para compensar o Header Fixo (ajuste conforme a altura do seu header) */
   padding-top: 80px; 
 }
 
@@ -28,14 +25,13 @@
   padding: 0 1rem;
   position: relative;
   
-  /* Margens dinâmicas baseadas na altura da tela */
+  /* Margens do Desktop (Mantidas) */
   margin-top: 10vh;
   margin-bottom: 2vh;
-  flex-shrink: 0; /* Impede que o texto seja esmagado se faltar espaço */
+  flex-shrink: 0;
 }
 
 .title {
-  /* CLAMP: Mínimo 3rem, Ideal 6vw, Máximo 5rem */
   font-size: clamp(3rem, 6vw, 5rem);
   line-height: 1.1;
   font-weight: 400;
@@ -55,15 +51,11 @@
 
 .carouselContainer {
   width: 100vw;
-  /* Altura fixa é necessária para a matemática do 3D, 
-     mas vamos ajustar a escala nas media queries se precisar */
   height: 350px; 
   position: relative;
   display: flex;
   justify-content: center;
   perspective: 1000px;
-  
-  /* Margem dinâmica para afastar do texto e do botão proporcionalmente */
   margin: 2vh 0 3vh 0;
 }
 
@@ -83,13 +75,9 @@
   
   border-radius: 18px;
   overflow: hidden;
-  
   will-change: transform;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  
-  /* Sombra suave para destacar do fundo preto */
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .cardImage {
@@ -100,7 +88,6 @@
 }
 
 .ctaButton {
-  /* Margem inferior dinâmica */
   margin-bottom: 5vh;
   padding: 0.8rem 3rem;
   border-radius: 999px;
@@ -122,44 +109,84 @@
   border-color: white;
 }
 
-/* --- MEDIA QUERIES PARA "RESPONSIVIDADE VERTICAL" --- */
-
-/* Telas com altura pequena (ex: Notebooks 1366x768 ou menores) */
+/* --- RESPONSIVIDADE DE ALTURA (MANTIDA) --- */
 @media (max-height: 800px) {
   .heroSection {
     padding-top: 60px;
   }
-  
-  /* Reduzimos um pouco a escala do carrossel para caber na tela sem sobrepor */
   .carouselContainer {
     height: 300px;
-    transform: scale(0.85); /* Truque visual: diminui tudo proporcionalmente */
-    margin: 0; /* Remove margem extra */
+    transform: scale(0.85);
+    margin: 0;
   }
-
   .title {
     margin-bottom: 0.5rem;
   }
-  
   .content {
     margin-top: 1vh;
     margin-bottom: 1vh;
   }
-  
   .ctaButton {
     margin-bottom: 3vh;
   }
 }
 
-/* Telas MUITO pequenas na altura (modo paisagem celular ou janelas pequenas) */
 @media (max-height: 600px) {
   .carouselContainer {
     transform: scale(0.7);
   }
   .heroSection {
-    /* Destrava a altura para permitir scroll se necessário */
     height: auto; 
     min-height: 100vh;
     padding-bottom: 2rem;
+  }
+}
+
+/* --- MOBILE SPECIFIC (ABAIXO DE 768px) --- */
+@media (max-width: 768px) {
+  .heroSection {
+    /* 1. Voltamos para o centro */
+    justify-content: center; 
+    
+    /* 2. Padding de segurança apenas para passar do Header (80px) */
+    padding-top: 90px;
+    padding-bottom: 2rem; /* Respiro embaixo */
+  }
+
+  .content {
+    /* 3. Resetamos as margens do desktop para o flexbox centralizar puro */
+    margin-top: 0; 
+    margin-bottom: 1.5rem;
+  }
+
+  .title {
+    font-size: 2.5rem; 
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
+
+  .carouselContainer {
+    /* Altura reduzida para mobile */
+    height: 280px; 
+    /* Margem simétrica para separar título e botão */
+    margin: 1rem 0;
+    transform: none; 
+  }
+
+  .card {
+    /* 180px para bater com o JS */
+    width: 180px;
+    height: 260px; 
+    border-radius: 12px;
+  }
+
+  .ctaButton {
+    /* Remove margens de empurrar para baixo, deixa o flex centralizar */
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0.8rem 2rem;
   }
 }
