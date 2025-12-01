@@ -1,5 +1,4 @@
 .section {
-  /* Espaçamento responsivo */
   padding: clamp(4rem, 8vh, 10rem) 2rem;
   background-color: #020202;
   position: relative;
@@ -23,11 +22,7 @@
   display: flex;
   width: 100%;
   
-  /* Altura responsiva:
-     - Mínimo: 450px
-     - Ideal: 65% da altura da tela
-     - Máximo: 800px 
-  */
+  /* Altura responsiva Desktop */
   height: clamp(450px, 65vh, 800px);
   
   max-width: 1500px;
@@ -37,18 +32,16 @@
 
 .panel {
   position: relative;
-  height: 100%;
+  height: 100%; 
   border-radius: 40px;
   overflow: hidden;
   cursor: pointer;
   
-  /* Flex-grow controlado pelo GSAP, mas definimos o padrão aqui */
+  /* Padrão desktop */
   flex-grow: 1; 
   
   transition: border-color 0.3s ease;
-  will-change: flex-grow;
-  
-  /* Garante que o conteúdo não vaze durante a animação */
+  will-change: flex-grow, height; 
   isolation: isolate; 
 }
 
@@ -79,7 +72,7 @@
   height: 100%;
   background: linear-gradient(
     to bottom,
-    rgba(0,0,0,0.8) 0%,   
+    rgba(0,0,0,0.8) 0%,    
     rgba(0,0,0,0.2) 50%,
     rgba(0,0,0,0.8) 100%
   );
@@ -87,16 +80,12 @@
   z-index: 1;
 }
 
-/* --- O ELEMENTO QUE DANÇA --- */
 .floatingLabel {
   position: absolute;
-  /* Define o ponto de partida padrão (estado inativo) */
   top: 50%;
   left: 50%;
   
-  /* O PULO DO GATO: */
-  /* translate(-50%, -50%) centraliza o ponto de ancoragem. */
-  /* O rotate(-90deg) é o estado inicial padrão (fechado). */
+  /* Estado inicial Desktop */
   transform: translate(-50%, -50%) rotate(-90deg);
   
   color: white;
@@ -109,8 +98,6 @@
   z-index: 20;
   pointer-events: none;
   
-  /* IMPORTANTE: Removemos qualquer 'transition' daqui. */
-  /* O GSAP deve ser o único dono do movimento. */
   will-change: top, transform; 
   -webkit-font-smoothing: antialiased;
 }
@@ -119,18 +106,35 @@
 @media (max-width: 900px) {
   .container { 
     flex-direction: column; 
-    height: auto;
-    min-height: 600px;
+    height: auto; 
+    min-height: auto;
   }
 
   .panel { 
-    height: 80px; 
+    flex-grow: 0; 
     width: 100%; 
-    flex-grow: 0 !important; /* GSAP não deve mexer na largura aqui */
+    height: 80px; 
   }
   
-  /* Quando ativo no mobile, cresce a altura */
-  .panel.active { 
-    height: 450px; 
+  /* --- NOVA REGRA: LIMITE DE 4 ITENS NO MOBILE --- */
+  /* Seleciona do 5º item em diante e esconde */
+  .panel:nth-child(n+5) {
+    display: none;
+  }
+
+  .overlay {
+
+  background: linear-gradient(
+    to left,
+    rgba(0,0,0,0.8) 0%,    
+    rgba(0,0,0,0.2) 50%,
+    rgba(0,0,0,0.8) 100%
+  );
+
+}
+  
+  .floatingLabel {
+    transform: translate(-50%, -50%) rotate(0deg);
+    font-size: 1.5rem;
   }
 }

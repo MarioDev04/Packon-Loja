@@ -12,13 +12,13 @@
 
 /* O container agora é aplicado na DIV do ScrollReveal */
 .container {
-  width: 100%;       /* Garante que o container ocupe a largura */
+  width: 100%;       
   max-width: 900px;
-  display: flex;     /* Ativa o Flexbox */
+  display: flex;     
   flex-direction: column;
-  align-items: center; /* Centraliza os filhos (Título e Botão) horizontalmente */
+  align-items: center; 
   gap: 3rem;
-  margin: 0 auto;    /* Centraliza o container na tela */
+  margin: 0 auto;    
 }
 
 .title {
@@ -26,10 +26,10 @@
   font-weight: 400;
   color: white;
   margin: 0;
-  text-align: center; /* Reforço para o texto quebrar centralizado */
+  text-align: center; 
+  line-height: 1.2;
 }
 
-/* ... restante do css igual ... */
 
 .button {
   padding: 0.8rem 3rem;
@@ -52,12 +52,29 @@
   border-color: white;
 }
 
-/* Mobile */
+/* --- MOBILE AJUSTADO --- */
 @media (max-width: 768px) {
   .section {
+    /* Reduz padding vertical para não ficar muito isolado no mobile */
     padding: 6rem 1.5rem;
   }
+
+  .container {
+    /* Aproxima o botão do texto */
+    gap: 2rem; 
+  }
+
   .title {
-    font-size: 2.5rem;
+    /* Tamanho equilibrado com a sessão de Benefícios (que ficou ~1.75rem) */
+    font-size: 2rem; 
+  }
+  
+  /* Ajuste fino no botão para mobile */
+  .button {
+    padding: 0.7rem 2.5rem; /* Um pouco menor */
+    font-size: 0.95rem;
+    width: 100%; /* Opcional: botão largura total no mobile fica bom as vezes */
+    max-width: 300px;
+    justify-content: center;
   }
 }

@@ -62,10 +62,7 @@
 
 .imageContainer {
   width: 100%;
-
   height: clamp(200px, 25vh, 320px); 
-  
-  /* Removemos min-height/max-height conflitantes */
   
   display: flex;
   align-items: center;
@@ -138,8 +135,8 @@
   }
 }
 
-/* Abaixo de 640px (Celulares) vira 1 coluna */
-@media (max-width: 700px) {
+/* Abaixo de 768px (Mobile / Tablets pequenos em portrait) */
+@media (max-width: 768px) {
   .gridContainer {
     grid-template-columns: 1fr;
   }
@@ -153,5 +150,11 @@
   .imageContainer {
     height: 250px; /* Altura fixa volta no mobile para consistência */
     flex: none;
+  }
+
+  /* --- NOVA REGRA: EXIBIR APENAS 3 ITENS --- */
+  /* O seletor :nth-child(n+4) pega todos os itens a partir do quarto e os esconde */
+  .card:nth-child(n+4) {
+    display: none;
   }
 }

@@ -1,6 +1,6 @@
 .section {
   padding: 8rem 2rem 2rem 2rem;
-  background-color: #020202; /* Mantendo a continuidade do fundo */
+  background-color: #020202; 
   color: white;
   display: flex;
   flex-direction: column;
@@ -12,11 +12,10 @@
 /* Título da Sessão */
 .title {
   font-size: 3rem;
-  font-weight: 400; /* Regular, não negrito */
+  font-weight: 400; 
   margin-bottom: 8rem;
   text-align: center;
   max-width: 900px;
-  
 }
 
 /* Container dos 3 itens */
@@ -24,7 +23,7 @@
   display: flex;
   justify-content: space-around;
   align-items: flex-start;
-  gap: 4rem; /* Espaço generoso entre colunas */
+  gap: 4rem; 
   max-width: 1400px;
   width: 100%;
   margin: 0 auto;
@@ -36,7 +35,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  flex: 1; /* Todos ocupam o mesmo espaço */
+  flex: 1; 
   max-width: 350px;
 }
 
@@ -46,9 +45,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  
-  /* Opcional: Um brilho suave atrás do ícone se quiser mais "tchan", 
-     mas a referência é clean, então deixaremos sem fundo */
 }
 
 /* Título do Card */
@@ -56,16 +52,16 @@
   font-size: 2rem;
   font-weight: 400;
   margin-bottom: 1rem;
-  white-space: nowrap; /* Tenta manter em uma linha se der */
+  white-space: nowrap; 
 }
 
 /* Descrição */
 .cardDesc {
   font-size: 1rem;
-  color: #ccc; /* Cinza claro para contraste */
+  color: #ccc; 
   font-weight: 300;
   line-height: 1.5;
-  max-width: 400px; /* Limita largura para quebrar a linha bonito */
+  max-width: 400px; 
 }
 
 /* Responsividade */
@@ -75,19 +71,47 @@
   }
 }
 
+/* --- MOBILE AJUSTADO (Refinado) --- */
 @media (max-width: 768px) {
+  .section {
+    /* Menos padding no topo para aproximar da sessão anterior */
+    padding: 4rem 1.5rem 2rem 1.5rem; 
+  }
+
   .title {
-    font-size: 2.2rem;
-    margin-bottom: 4rem;
+    /* Reduzido para proporção correta no mobile */
+    font-size: 2rem; 
+    margin-bottom: 4rem; /* Aproxima dos cards */
+    line-height: 1.2;
   }
   
   .grid {
     flex-direction: column;
     align-items: center;
-    gap: 4rem;
+    gap: 3rem; /* Espaço entre cada benefício reduzido */
+  }
+  
+  .card {
+    /* Garante que o texto não fique muito largo no mobile */
+    max-width: 300px; 
+  }
+
+  .iconWrapper {
+    margin-bottom: 1rem;
+    /* Reduz levemente o ícone para acompanhar o texto menor */
+    transform: scale(0.85); 
   }
   
   .cardTitle {
-    white-space: normal;
+    /* Redução drástica para não brigar com o título principal */
+    font-size: 1.25rem; 
+    margin-bottom: 0.5rem;
+    white-space: normal; /* Permite quebrar linha se precisar */
+  }
+
+  .cardDesc {
+    font-size: 0.9rem;
+    color: #b0b0b0;
+    line-height: 1.4;
   }
 }

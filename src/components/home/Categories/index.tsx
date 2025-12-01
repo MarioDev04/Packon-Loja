@@ -16,7 +16,6 @@ const CATEGORIES = [
 ];
 
 export default function Categories() {
-  // Começa com o ID 1 ativo
   const [activeId, setActiveId] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -25,29 +24,61 @@ export default function Categories() {
 
   const { contextSafe } = useGSAP({ scope: containerRef }, []);
 
-  // Configuração Inicial (Roda apenas uma vez ao montar)
+  // --- CONFIGURAÇÃO INICIAL (Responsiva) ---
   useGSAP(() => {
-    CATEGORIES.forEach((cat, idx) => {
-      const isActive = cat.id === activeId;
-      const panel = panelsRef.current[idx];
-      const text = textsRef.current[idx];
+    const mm = gsap.matchMedia();
 
-      if (panel && text) {
-        // Define estado inicial sem animar (set)
-        gsap.set(panel, { flexGrow: isActive ? 4 : 1 });
-        
-        gsap.set(text, {
-          top: isActive ? "15%" : "50%",
-          rotate: isActive ? 0 : -90, // Usamos 'rotate' que é mais moderno que 'rotation'
-          color: isActive ? "#ffffff" : "#fff" // Opcional: escurece um pouco os inativos
-        });
-      }
+    // Lógica Desktop (> 900px)
+    mm.add("(min-width: 901px)", () => {
+      CATEGORIES.forEach((cat, idx) => {
+        const isActive = cat.id === activeId;
+        const panel = panelsRef.current[idx];
+        const text = textsRef.current[idx];
+
+        if (panel && text) {
+          gsap.set(panel, { 
+            flexGrow: isActive ? 4 : 1, 
+            height: "100%" // Reseta altura se vier do mobile
+          });
+          gsap.set(text, {
+            top: isActive ? "15%" : "50%",
+            rotate: isActive ? 0 : -90,
+            color: isActive ? "#ffffff" : "#fff"
+          });
+        }
+      });
     });
-  }, { scope: containerRef }); // Roda uma vez na montagem
 
+    // Lógica Mobile (<= 900px)
+    mm.add("(max-width: 900px)", () => {
+      CATEGORIES.forEach((cat, idx) => {
+        const isActive = cat.id === activeId;
+        const panel = panelsRef.current[idx];
+        const text = textsRef.current[idx];
+
+        if (panel && text) {
+          gsap.set(panel, { 
+            flexGrow: 0, // Desativa flexGrow
+            height: isActive ? 400 : 80 // Altura em pixels
+          });
+          gsap.set(text, {
+            top: isActive ? "15%" : "50%",
+            rotate: 0, // Texto sempre horizontal no mobile
+            color: isActive ? "#ffffff" : "#fff"
+          });
+        }
+      });
+    });
+
+  }, { scope: containerRef }); // Roda na montagem e resize
+
+  // --- CLICK HANDLER (Responsivo) ---
   const handleClick = contextSafe((id: number) => {
     if (id === activeId) return;
     setActiveId(id);
+
+    // Detecta se é mobile no momento do clique
+    const isMobile = window.matchMedia("(max-width: 900px)").matches;
 
     CATEGORIES.forEach((cat, idx) => {
       const isActive = cat.id === id;
@@ -56,27 +87,41 @@ export default function Categories() {
 
       if (!panel || !text) return;
 
-      // --- 1. Animação "Líquida" do Painel ---
-      gsap.to(panel, {
-        flexGrow: isActive ? 4 : 1,
-        duration: 0.8,
-        ease: "power3.inOut", // Suave no início e fim
-        overwrite: "auto"
-      });
+      if (isMobile) {
+        // --- ANIMAÇÃO MOBILE (Altura) ---
+        gsap.to(panel, {
+          height: isActive ? 400 : 80, // Expande altura
+          duration: 0.6,
+          ease: "power3.inOut",
+          overwrite: "auto"
+        });
 
-      // --- 2. Animação "Líquida" do Texto ---
-      // Aqui acontece a mágica: Rotação e Posição simultâneas
-      gsap.to(text, {
-        top: isActive ? "15%" : "50%",
-        rotate: isActive ? 0 : -90,
-        
-        // Pequeno ajuste de cor para dar destaque ao ativo
-        color: isActive ? "#ffffff" : "rgb(255,255,255)", 
-        
-        duration: 0.8,
-        ease: "power3.inOut", // Sincronizado com o painel
-        overwrite: "auto"
-      });
+        gsap.to(text, {
+          top: isActive ? "15%" : "50%",
+          rotate: 0, // Sempre reto
+          color: isActive ? "#ffffff" : "rgba(255,255,255,0.7)",
+          duration: 0.6,
+          overwrite: "auto"
+        });
+
+      } else {
+        // --- ANIMAÇÃO DESKTOP (FlexGrow) ---
+        gsap.to(panel, {
+          flexGrow: isActive ? 4 : 1,
+          height: "100%", // Garante altura total
+          duration: 0.8,
+          ease: "power3.inOut",
+          overwrite: "auto"
+        });
+
+        gsap.to(text, {
+          top: isActive ? "15%" : "50%",
+          rotate: isActive ? 0 : -90,
+          color: isActive ? "#ffffff" : "rgba(255,255,255,0.7)",
+          duration: 0.8,
+          overwrite: "auto"
+        });
+      }
     });
   });
 
@@ -91,7 +136,6 @@ export default function Categories() {
         {CATEGORIES.map((cat, index) => (
           <div
             key={cat.id}
-            // Removemos a classe 'active' do HTML para não causar conflito CSS vs GSAP
             className={styles.panel} 
             ref={(el) => { if (el) panelsRef.current[index] = el }}
             onClick={() => handleClick(cat.id)}

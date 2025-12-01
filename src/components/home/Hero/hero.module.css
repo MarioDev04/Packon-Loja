@@ -132,9 +132,7 @@
 }
 
 @media (max-height: 600px) {
-  .carouselContainer {
-    transform: scale(0.7);
-  }
+
   .heroSection {
     height: auto; 
     min-height: 100vh;
