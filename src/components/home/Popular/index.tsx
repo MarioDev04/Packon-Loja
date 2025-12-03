@@ -2,20 +2,59 @@
 
 import styles from "./popular.module.css";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { formatPrice } from "@/utils/format";
+import Link from "next/link";
+import { useCartStore } from "@/store/cartStore"; // <--- Importamos a store
 
-const PRODUCTS = [
-  { id: 1, name: "stand-up pouch", price: "R$ 189,90", img: "/stand-up.png" },
-  { id: 2, name: "stand-up pouch", price: "R$ 99,90", img: "/stand-up.png" },
-  { id: 3, name: "stand-up pouch", price: "R$ 129,90", img: "/stand-up.png" },
-  { id: 4, name: "stand-up pouch", price: "R$ 89,90", img: "/stand-up.png" },
-  { id: 5, name: "stand-up pouch", price: "R$ 49,90", img: "/stand-up.png" },
-  { id: 6, name: "stand-up pouch", price: "R$ 19,90", img: "/stand-up.png" },
-  { id: 7, name: "stand-up pouch", price: "R$ 69,90", img: "/stand-up.png" },
-  { id: 8, name: "stand-up pouch", price: "R$ 79,90", img: "/stand-up.png" },
-  { id: 9, name: "stand-up pouch", price: "R$ 59,90", img: "/stand-up.png" },
-];
+// Tipagem atualizada com Variants
+interface ProductNode {
+  id: string;
+  title: string;
+  handle: string;
+  priceRange: {
+    minVariantPrice: {
+      amount: string;
+      currencyCode: string;
+    };
+  };
+  images: {
+    edges: {
+      node: {
+        url: string;
+        altText: string;
+      };
+    }[];
+  };
+  variants: {
+    edges: {
+      node: {
+        id: string;
+        availableForSale: boolean;
+      };
+    }[];
+  };
+}
 
-export default function Popular() {
+interface PopularProps {
+  products: {
+    node: ProductNode;
+  }[];
+}
+
+export default function Popular({ products }: PopularProps) {
+  const { addItem, openCart } = useCartStore(); // <--- Pegamos as funções
+
+  if (!products || products.length === 0) {
+    return null; 
+  }
+
+  const handleAddToCart = async (variantId: string) => {
+    // 1. Adiciona ao carrinho
+    await addItem(variantId, 1);
+    // 2. Abre o carrinho para mostrar que funcionou (Opcional, mas recomendado)
+    openCart(); 
+  };
+
   return (
     <section className={styles.popularSection}>
       
@@ -23,24 +62,47 @@ export default function Popular() {
         <h2 className={styles.title}>Produtos em destaque</h2>
       </ScrollReveal>
 
-      {/* Aplicamos o ScrollReveal diretamente no Grid */}
       <ScrollReveal className={styles.gridContainer} stagger={0.1}>
-        {PRODUCTS.map((product) => (
-          <div key={product.id} className={styles.card}>
-            <div className={styles.imageContainer}>
-              <img src={product.img} alt={product.name} className={styles.productImg} />
-            </div>
+        {products.map(({ node: product }) => {
+          const image = product.images.edges[0]?.node;
+          const price = product.priceRange.minVariantPrice;
+          
+          // Pegamos a primeira variante disponível (Padrão)
+          const firstVariant = product.variants?.edges[0]?.node;
+          const isAvailable = firstVariant?.availableForSale;
 
-            <div className={styles.info}>
-              <h3 className={styles.productName}>{product.name}</h3>
-              <p className={styles.price}>{product.price}</p>
-            </div>
+          return (
+            <div key={product.id} className={styles.card}>
+              <Link href={`/produtos/${product.handle}`} className={styles.imageContainer}>
+                 {image ? (
+                    <img 
+                      src={image.url} 
+                      alt={image.altText || product.title} 
+                      className={styles.productImg} 
+                    />
+                 ) : (
+                   <div className={styles.productImg} style={{background: '#222', width: '100%', height: '100%'}} />
+                 )}
+              </Link>
 
-            <button className={styles.buyButton}>
-              Comprar
-            </button>
-          </div>
-        ))}
+              <div className={styles.info}>
+                <h3 className={styles.productName}>{product.title}</h3>
+                <p className={styles.price}>
+                  {formatPrice(price.amount, price.currencyCode)}
+                </p>
+              </div>
+
+              <button 
+                className={styles.buyButton}
+                onClick={() => firstVariant && handleAddToCart(firstVariant.id)}
+                disabled={!isAvailable} // Desativa se não tiver estoque
+                style={{ opacity: isAvailable ? 1 : 0.5, cursor: isAvailable ? 'pointer' : 'not-allowed' }}
+              >
+                {isAvailable ? 'Comprar' : 'Indisponível'}
+              </button>
+            </div>
+          );
+        })}
       </ScrollReveal>
 
     </section>

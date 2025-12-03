@@ -1,46 +1,45 @@
 .header {
   position: fixed;
   top: 3rem;
-  left: 50%; /* GSAP cuida do translate(-50%) */
+  left: 50%;
+  /* O translate(-50%) é gerenciado pelo GSAP no código, mas pode por aqui por segurança */
   width: 90%;
   max-width: 1480px;
   
-  /* Altura inicial fixa, mas o GSAP vai mudar para 'auto' quando abrir */
-  height: 80px;
+  /* Comportamento de Coluna: Navbar em cima, Carrinho embaixo */
+  display: flex;
+  flex-direction: column; 
+  align-items: center; /* Centraliza o conteudo interno se precisar */
+  justify-content: flex-start; /* Começa do topo */
   
-  /* Glassmorphism */
+  /* Altura inicial fixa (apenas a barra) */
+  height: 80px; 
+  
   background: rgba(20, 20, 20, 0.6);
   backdrop-filter: blur(12px);
-  
   border-radius: 50px;
   
-  /* Layout Base: Flex Row para Desktop */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  
-  /* Padding lateral responsivo */
+  /* Padding lateral */
   padding: 0 clamp(1.5rem, 4vw, 4rem);
   
   z-index: 100;
   color: white;
-  
-  /* Importante para a animação de altura funcionar sem vazar conteúdo */
-  overflow: hidden;
-  
-  /* Estados iniciais para o GSAP da entrada */
+  overflow: hidden; /* Importante para a animação */
+
   opacity: 0; 
   visibility: hidden;
+  will-change: height, background-color;
 }
 
+.navBar {
+  width: 100%;
+  height: 80px; /* Mesma altura inicial do header */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0; /* Impede que essa barra seja esmagada */
+}
 /* Wrapper para alinhar logo e itens no Desktop */
-.topBar {
-    display: flex;
-    align-items: center;
-    /* No mobile, o topBar precisa ocupar a largura para separar Logo e Hamburguer */
-    flex-grow: 0; 
-}
-
 .logoLink {
   display: block;
 }
@@ -88,12 +87,30 @@
 }
 
 .mobileContent {
-    display: none; /* Escondido no Desktop */
-    width: 100%;
-    flex-direction: column;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-    gap: 1.5rem;
+  display: none;
+  width: 100%;
+  flex-direction: column;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  /* Removemos o gap daqui, pois ele será gerenciado pelos wrappers internos */
+  gap: 0; 
+}
+
+/* Este é o novo container que segura a Busca, Botão Carrinho e Links.
+   Ele precisa ter as mesmas regras de layout que o mobileContent tinha antes.
+*/
+.mobileNavWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* O espaçamento original entre os itens */
+  width: 100%;
+}
+
+/* O container do carrinho mobile */
+.mobileCartWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* --- ESTILIZAÇÃO DO CONTEÚDO MOBILE --- */
@@ -206,6 +223,43 @@
 .cartButton:hover { color: #a5a5a5; transform: scale(1.05); }
 .cartIcon { color: #fff; }
 
+.cartButton {
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  background-color: white;
+  color: black;
+  font-size: 0.7rem;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Container do Carrinho (Invisível por padrão) */
+.cartContainer {
+  width: 100%;
+  /* Inicialmente escondido */
+  display: none; 
+  opacity: 0;
+  
+  /* Não precisa de margin-top pois o header já cresce */
+  padding-top: 1rem; 
+}
+
+/* Opcional: Esconder a Nav Desktop quando o Carrinho expande para limpar o visual */
+.hiddenOnExpanded {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
 
 /* =========================================
    MEDIA QUERIES (A Mágica acontece aqui)

@@ -1,0 +1,307 @@
+.container {
+  padding: 120px 2rem 4rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+  color: white;
+  font-family: var(--font-inter), sans-serif;
+}
+
+.topSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+    margin-top: 10vh;
+}
+
+/* --- COLUNA ESQUERDA: CONTAINER IMAGEM --- */
+.imageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 600px; /* Limite para não ficar gigante */
+  
+  /* A Borda Branca com cantos arredondados */
+  border: 1px solid rgba(255, 255, 255, 1);
+  border-radius: 40px;
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3rem;
+  margin: 0 auto; /* Centraliza na coluna */
+}
+
+.mainImageWrapper {
+  position: relative;
+  width: 100%;
+  height: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.mainImage {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+}
+
+.thumbnailsRow {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  z-index: 10;
+}
+
+.thumbBox {
+  width: 60px;
+  height: 60px; /* Levemente retangular como na imagem */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.thumbBox:hover, .thumbActive {
+  border-color: #fff;
+  transform: scale(1.05);
+}
+
+.thumbImg {
+  object-fit: contain;
+  padding: 5px;
+}
+
+/* --- COLUNA DIREITA: INFOS --- */
+.infoContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 2rem;
+}
+
+.title {
+  font-size: 3.5rem;
+  font-weight: 300;
+  line-height: 1.1;
+}
+
+.priceWrapper {
+  margin-bottom: 1.2rem;
+}
+
+.priceValue {
+  font-size: 2.2rem;
+  font-weight: 400;
+}
+
+/* --- LINHA DE CONTROLE (A MÁGICA) --- */
+.controlsRow {
+  display: flex;
+  flex-wrap: wrap; /* Permite quebrar linha se apertar */
+  align-items: center;
+  gap: 2rem; /* Espaço entre o grupo Expessura e o grupo Quantidade */
+  margin-bottom: 1.2rem;
+}
+
+.controlGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.controlLabel {
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
+.pillsWrapper {
+  display: flex;
+  gap: 0.8rem;
+}
+
+/* Botões de Opção (0.20, 0.24) */
+.pillBtn {
+  background: transparent;
+  border: 1px solid white;
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 99px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 60px;
+}
+
+.pillBtn:hover, .pillBtnActive {
+  background: white;
+  color: black;
+}
+
+/* Botão de Quantidade (- 500 +) */
+.qtyPill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid white;
+  border-radius: 99px;
+  padding: 0.5rem 1rem;
+  min-width: 120px;
+}
+
+.qtyPill button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 0.5rem;
+}
+
+/* Truque para esconder o + visualmente se quiser ficar igual a imagem que só tem texto, 
+   mas mantendo a area clicavel. Ajuste conforme necessidade */
+.hiddenBtn {
+  opacity: 0; 
+  position: absolute;
+  width: 100%; height: 100%;
+  left:0; top:0;
+}
+/* Revertendo para botões funcionais visíveis para garantir usabilidade */
+.qtyPill button { opacity: 1; position: relative; } 
+
+/* --- FRETE --- */
+.shippingSection {
+  margin-bottom: 3rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.sectionLabel {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 0.8rem;
+}
+
+.shippingForm {
+  display: flex;
+  flex-direction: column; /* Input em cima, botão em baixo */
+  gap: 1rem;
+}
+
+.shippingInput {
+  background: transparent;
+  border: 1px solid white;
+  border-radius: 99px;
+  padding: 0.8rem 1.5rem;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  width: 100%;
+}
+
+.shippingBtn {
+  align-self: flex-start; /* Botão alinhado a esquerda */
+  background: white;
+  color: black;
+  border: none;
+  border-radius: 99px;
+  padding: 0.6rem 1.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  transition: transform 0.2s;
+}
+
+.shippingBtn:hover {
+  transform: scale(1.05);
+}
+
+.shippingResult {
+  margin-top: 0.8rem;
+  color: #dec34a;
+  font-size: 0.9rem;
+}
+
+/* --- BOTÃO ADD --- */
+.addToCartBtn {
+  width: 100%;
+  max-width: 350px;
+  background: white;
+  color: black;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 99px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.3rem;
+  transition: transform 0.2s;
+}
+
+.addToCartBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(255,255,255,0.1);
+}
+
+.addToCartBtn:disabled {
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* --- ESPECIFICAÇÕES --- */
+.specsContainer {
+  margin-top: 8rem;
+  padding-top: 0;
+}
+
+.specsTitle {
+  font-size: 1.8rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+}
+
+.specsContent {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #ddd;
+  max-width: 900px;
+}
+
+/* --- MOBILE --- */
+@media (max-width: 1024px) {
+  .topSection {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  
+  .imageContainer {
+    max-width: 100%;
+    margin-bottom: 2rem;
+  }
+  
+  .infoContainer {
+    padding-left: 0;
+  }
+  
+  .title {
+    font-size: 2.5rem;
+  }
+  
+  /* No mobile, talvez queira forçar a quebra para organizar */
+  .controlsRow {
+    gap: 1.5rem;
+  }
+}

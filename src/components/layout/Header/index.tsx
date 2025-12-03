@@ -1,160 +1,246 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Search, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./header.module.css";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { useCartStore } from "@/store/cartStore";
+import CartContent from "./CartContent";
 
 export default function Header() {
   const headerRef = useRef<HTMLElement>(null);
-  const mobileContentRef = useRef<HTMLDivElement>(null);
-  // Refs para as linhas do menu hamburguer
+  
+  // Refs para as "Telas" do Mobile
+  const mobileContentRef = useRef<HTMLDivElement>(null); // Container Pai Mobile
+  const mobileMenuRef = useRef<HTMLDivElement>(null);    // Tela 1: Links
+  const mobileCartRef = useRef<HTMLDivElement>(null);    // Tela 2: Carrinho
+
+  // Refs do Desktop
+  const cartContentRef = useRef<HTMLDivElement>(null);
+
+  // Hamburger
   const line1Ref = useRef<HTMLSpanElement>(null);
   const line2Ref = useRef<HTMLSpanElement>(null);
   const line3Ref = useRef<HTMLSpanElement>(null);
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const { isOpen: isCartOpen, openCart, closeCart, cart } = useCartStore();
+
+  const mobileTl = useRef<gsap.core.Timeline | null>(null);
+  const cartTl = useRef<gsap.core.Timeline | null>(null);
+
+const totalItems = cart?.lines?.edges?.length || 0;
 
   const { contextSafe } = useGSAP(() => {
-    // 1. Animação de Entrada Inicial (Mantida do seu original)
-    gsap.set(headerRef.current, {
-      xPercent: -50,
-      y: -150,
-      autoAlpha: 0 
-    });
+    // 1. Entrada Header
+    gsap.set(headerRef.current, { xPercent: -50, y: -150, autoAlpha: 0 });
+    gsap.to(headerRef.current, { y: 0, autoAlpha: 1, duration: 1.2, ease: "power4.out", delay: 0.2 });
 
-    gsap.to(headerRef.current, {
-      y: 0,
-      autoAlpha: 1,
-      duration: 1.2,
-      ease: "power4.out",
-      delay: 0.2
-    });
-
-    // 2. Criar a timeline do Menu Mobile (Pausada inicialmente)
-    // Essa timeline expande o header e anima os itens internos
-    const tl = gsap.timeline({ paused: true, defaults: { ease: "power3.inOut" } });
-
-    if (headerRef.current && mobileContentRef.current && line1Ref.current && line2Ref.current && line3Ref.current) {
+    // 2. Timeline ABERTURA DO MENU MOBILE (Geral)
+    const mTl = gsap.timeline({ paused: true });
+    
+    if (headerRef.current && mobileContentRef.current && line1Ref.current) {
         
-        // A. Animação do Ícone (Vira X)
-        tl.to(line2Ref.current, { scaleX: 0, opacity: 0, duration: 0.2 }, 0)
-          .to(line1Ref.current, { y: 9, rotate: 45, duration: 0.3 }, 0)
-          .to(line3Ref.current, { y: -9, rotate: -45, duration: 0.3 }, 0);
+        // Passo 1: Prepara o conteúdo (invisível, mas ocupando espaço)
+        mTl.set(mobileContentRef.current, { display: 'flex', autoAlpha: 0, y: -20 });
 
-        // B. Expansão do Header
-        tl.to(headerRef.current, {
-            height: "auto", // GSAP calcula a altura necessária
-            borderRadius: "32px", // Fica um pouco menos redondo expandido pra caber melhor
-            backgroundColor: "rgba(20, 20, 20, 0.95)", // Mais opaco para leitura
-            duration: 0.6,
-            ease: "power3.inOut"
+        // Passo 2: Animação do Ícone Hamburguer (Rápida)
+        mTl.to(line2Ref.current, { scaleX: 0, opacity: 0, duration: 0.2 }, 0)
+           .to(line1Ref.current, { y: 9, rotate: 45, duration: 0.3 }, 0)
+           .to(line3Ref.current, { y: -9, rotate: -45, duration: 0.3 }, 0);
+        
+        // Passo 3: A Expansão com "Peso" (Igual ao Desktop)
+        mTl.to(headerRef.current, { 
+            height: "auto", 
+            borderRadius: "32px", 
+            backgroundColor: "rgba(20,20,20, 0.6)", // Fundo escuro
+            duration: 0.9, // Duração longa para dar a sensação de "arrastar"
+            ease: "expo.inOut" // A curva mágica que dá o peso
         }, 0);
+        
+        // Passo 4: O conteúdo surge suavemente
+        mTl.to(mobileContentRef.current, { 
+           autoAlpha: 1, 
+           y: 0, 
+           duration: 0.6,
+           ease: "power2.out"
+        }, "-=0.5"); // Entra antes da caixa terminar de abrir
 
-        // C. Entrada do Conteúdo (Stagger)
-        // Selecionamos os filhos diretos do container mobile para animar
-        const mobileItems = mobileContentRef.current.children;
-        tl.fromTo(mobileItems, 
-            { y: 20, autoAlpha: 0 },
-            { y: 0, autoAlpha: 1, stagger: 0.1, duration: 0.5 },
-            "-=0.3"
-        );
+        // Garante o estado inicial dos sub-menus
+        mTl.set(mobileMenuRef.current, { autoAlpha: 1, display: 'flex' }, 0);
+        mTl.set(mobileCartRef.current, { autoAlpha: 0, display: 'none' }, 0);
     }
+    mobileTl.current = mTl;
 
-    tlRef.current = tl;
+    // 3. Timeline DESKTOP CART (Igual ao anterior)
+    const cTl = gsap.timeline({ paused: true });
+    if (headerRef.current && cartContentRef.current) {
+        cTl.set(cartContentRef.current, { display: 'flex', autoAlpha: 0, y: -20 })
+           .to(headerRef.current, { 
+              height: "auto", 
+              borderRadius: "32px", 
+              backgroundColor: "rgba(20,20,20,0.6)",
+              duration: 0.9, 
+              ease: "expo.inOut", 
+           })
+           .to(cartContentRef.current, { 
+              autoAlpha: 1, 
+              y: 0, 
+              duration: 0.6,
+              ease: "power2.out" 
+           }, "-=0.5");
+    }
+    cartTl.current = cTl;
 
   }, { scope: headerRef });
 
-  const toggleMenu = contextSafe(() => {
-    if (!tlRef.current) return;
-    
-    if (!isMenuOpen) {
-        setIsMenuOpen(true);
-        tlRef.current.play();
+  // --- ANIMAÇÃO DE TROCA (MENU <-> CART) ---
+  const switchMobileView = contextSafe((target: 'cart' | 'menu') => {
+    if (!mobileMenuRef.current || !mobileCartRef.current) return;
+
+    if (target === 'cart') {
+      // Fade OUT Menu -> Fade IN Cart
+      gsap.to(mobileMenuRef.current, { 
+        autoAlpha: 0, 
+        duration: 0.3, 
+        onComplete: () => {
+          gsap.set(mobileMenuRef.current, { display: 'none' });
+          gsap.set(mobileCartRef.current, { display: 'block' });
+          gsap.fromTo(mobileCartRef.current, 
+            { autoAlpha: 0, x: 20 }, 
+            { autoAlpha: 1, x: 0, duration: 0.4 }
+          );
+        }
+      });
     } else {
-        setIsMenuOpen(false);
-        tlRef.current.reverse();
+      // Fade OUT Cart -> Fade IN Menu
+      gsap.to(mobileCartRef.current, { 
+        autoAlpha: 0, 
+        duration: 0.3, 
+        onComplete: () => {
+          gsap.set(mobileCartRef.current, { display: 'none' });
+          gsap.set(mobileMenuRef.current, { display: 'flex' });
+          gsap.fromTo(mobileMenuRef.current, 
+            { autoAlpha: 0, x: -20 }, 
+            { autoAlpha: 1, x: 0, duration: 0.4 }
+          );
+        }
+      });
     }
   });
+
+  // --- EFEITOS E HANDLERS ---
+  
+  useEffect(() => {
+    if (cartTl.current && window.innerWidth > 1024) { // Só ativa desktop cart se for desktop
+        if (isCartOpen) {
+            if (isMobileMenuOpen) toggleMobileMenu();
+            cartTl.current.play();
+        } else {
+            cartTl.current.reverse();
+        }
+    }
+  }, [isCartOpen]);
+
+  const toggleMobileMenu = contextSafe(() => {
+    if (!mobileTl.current) return;
+    if (!isMobileMenuOpen) {
+        if (isCartOpen) closeCart(); 
+        setIsMobileMenuOpen(true);
+        mobileTl.current.play();
+        
+        // Reset sempre para o menu de links ao abrir
+        gsap.set(mobileMenuRef.current, { display: 'flex', autoAlpha: 1, x: 0 });
+        gsap.set(mobileCartRef.current, { display: 'none', autoAlpha: 0 });
+
+    } else {
+        setIsMobileMenuOpen(false);
+        mobileTl.current.reverse();
+    }
+  });
+
+  const handleCartClick = () => {
+      if (isCartOpen) closeCart();
+      else openCart();
+  };
 
   return (
     <header className={styles.header} ref={headerRef}>
       
-      {/* --- TOP BAR: Logo e Hamburger (Sempre visíveis ou controlados por CSS) --- */}
-      <div className={styles.topBar}>
+      <div className={styles.navBar}>
           <Link href="/" className={styles.logoLink}>
             <div className={styles.logoWrapper}>
-              <Image 
-                src="/logo.png" 
-                alt="Logo Conceito" 
-                fill 
-                priority 
-                sizes="120px"
-                style={{ objectFit: 'contain' }}
-              />
+              <Image src="/logo.png" alt="Packon" fill priority sizes="120px" style={{ objectFit: 'contain' }} />
             </div>
           </Link>
 
-          {/* Botão Hamburger (Só aparece no mobile via CSS) */}
-          <button className={styles.hamburger} onClick={toggleMenu} aria-label="Menu">
+          {/* Desktop Nav */}
+          <nav className={styles.desktopNav}>
+            <Link href="/" className={styles.navLink}>Início</Link>
+            <Link href="/produtos" className={styles.navLink}>Loja</Link>
+            <Link href="/quem-somos" className={styles.navLink}>Quem somos</Link>
+            <Link href="/contato" className={styles.navLink}>Contato</Link>
+          </nav>
+
+          {/* Desktop Actions */}
+          <div className={styles.desktopActions}>
+            <div className={styles.searchContainer}>
+              <input type="text" className={styles.searchInput} placeholder="Buscar..." />
+              <button className={styles.iconButton}><Search size={18} color="#a1a1a1" /></button>
+            </div>
+            <button className={styles.cartButton} onClick={handleCartClick}>
+              <ShoppingCart className={styles.cartIcon} size={26} />
+              {totalItems > 0 && <span className={styles.badge}>{totalItems}</span>}
+            </button>
+          </div>
+
+          {/* Mobile Hamburger */}
+          <button className={styles.hamburger} onClick={toggleMobileMenu}>
               <span ref={line1Ref} className={styles.line}></span>
               <span ref={line2Ref} className={styles.line}></span>
               <span ref={line3Ref} className={styles.line}></span>
           </button>
       </div>
       
-      {/* --- DESKTOP NAV & ACTIONS (Somem no mobile via CSS) --- */}
-      <nav className={styles.desktopNav}>
-        <Link href="/" className={styles.navLink}>Início</Link>
-        <Link href="/produtos" className={styles.navLink}>Produtos</Link>
-        <Link href="/quem-somos" className={styles.navLink}>Quem somos</Link>
-        <Link href="/contato" className={styles.navLink}>Contato</Link>
-      </nav>
-
-      <div className={styles.desktopActions}>
-        <div className={styles.searchContainer}>
-          <input 
-            type="text" 
-            className={styles.searchInput} 
-            placeholder="Buscar..." 
-            aria-label="Buscar produtos"
-          />
-          <button className={styles.iconButton} aria-label="Pesquisar">
-             <Search size={18} color="#a1a1a1" />
-          </button>
-        </div>
-        <button className={styles.cartButton} aria-label="Carrinho">
-          <ShoppingCart className={styles.cartIcon} size={26} />
-        </button>
+      {/* DESKTOP CARRINHO */}
+      <div className={styles.cartContainer} ref={cartContentRef}>
+          <CartContent />
       </div>
 
-      {/* --- MOBILE CONTENT (Expande para baixo) --- */}
+      {/* MOBILE CONTAINER GERAL */}
       <div className={styles.mobileContent} ref={mobileContentRef}>
           
-          {/* 1. Busca */}
-          <div className={styles.mobileSearch}>
-              <Search size={20} color="#fff" />
-              <input type="text" placeholder="O que você procura?" />
+          {/* TELA 1: MENU DE LINKS + BUSCA */}
+          <div className={styles.mobileNavWrapper} ref={mobileMenuRef}>
+             <div className={styles.mobileSearch}>
+                <Search size={20} color="#fff" />
+                <input type="text" placeholder="O que você procura?" />
+             </div>
+
+             {/* Botão que chama a TELA 2 (Carrinho) */}
+             <button className={styles.mobileCartBtn} onClick={() => switchMobileView('cart')}>
+                <ShoppingCart size={32} />
+                <span>Carrinho ({totalItems})</span>
+             </button>
+
+             <nav className={styles.mobileNav}>
+               <Link href="/" className={styles.mobileNavLink} onClick={toggleMobileMenu}>Início</Link>
+               <Link href="/produtos" className={styles.mobileNavLink} onClick={toggleMobileMenu}>Produtos</Link>
+               <Link href="/quem-somos" className={styles.mobileNavLink} onClick={toggleMobileMenu}>Quem somos</Link>
+               <Link href="/contato" className={styles.mobileNavLink} onClick={toggleMobileMenu}>Contato</Link>
+             </nav>
           </div>
 
-          {/* 2. Carrinho (Com texto e ícone) */}
-          <button className={styles.mobileCartBtn}>
-              <ShoppingCart size={32} />
-              <span>Carrinho</span>
-              
-          </button>
+          {/* TELA 2: CARRINHO INTERNO */}
+          <div className={styles.mobileCartWrapper} ref={mobileCartRef} style={{ display: 'none', opacity: 0 }}>
+             {/* Passamos a função de voltar para o componente */}
+             <CartContent onBack={() => switchMobileView('menu')} />
+          </div>
 
-          {/* 3. Navegação Vertical */}
-          <nav className={styles.mobileNav}>
-            <Link href="/" className={styles.mobileNavLink} onClick={toggleMenu}>Início</Link>
-            <Link href="/produtos" className={styles.mobileNavLink} onClick={toggleMenu}>Produtos</Link>
-            <Link href="/quem-somos" className={styles.mobileNavLink} onClick={toggleMenu}>Quem somos</Link>
-            <Link href="/contato" className={styles.mobileNavLink} onClick={toggleMenu}>Contato</Link>
-          </nav>
       </div>
 
     </header>

@@ -96,7 +96,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
+  max-width: 300px;
+  display: inline-block;
 }
 
 .price {

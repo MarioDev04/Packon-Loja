@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { SmoothScroll } from "@/components/SmoothScroll"; // Vamos criar abaixo
+import { SmoothScroll } from "@/components/SmoothScroll";
+import CartProvider from "@/components/CartProvider"; // Importe aqui
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -18,9 +19,11 @@ export default function RootLayout({
   return (
     <html lang="pt-br">
       <body className={inter.className}>
-        <SmoothScroll>
-          {children}
-        </SmoothScroll>
+        <CartProvider> {/* Envolva aqui */}
+          <SmoothScroll>
+            {children}
+          </SmoothScroll>
+        </CartProvider>
       </body>
     </html>
   );
