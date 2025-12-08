@@ -3,8 +3,10 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import CartProvider from "@/components/CartProvider"; // Importe aqui
+import SearchResults from "@/components/layout/SearchResults"; // Importe o novo componente
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+
 
 export const metadata: Metadata = {
   title: "Packon",
@@ -22,6 +24,7 @@ export default function RootLayout({
         <CartProvider> {/* Envolva aqui */}
           <SmoothScroll>
             {children}
+            <SearchResults />
           </SmoothScroll>
         </CartProvider>
       </body>

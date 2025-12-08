@@ -1,12 +1,9 @@
-// src/lib/shopify.ts
+const domain = process.env.NEXT_PUBLIC_SHOPIFY_DOMAIN!;
+const storefrontAccessToken = process.env.NEXT_PUBLIC_SHOPIFY_ACCESS_TOKEN!;
 
-// 1. COLOQUE O DOMÍNIO SEM "HTTPS://" E SEM BARRA NO FINAL
-// Exemplo correto: "packon-embalagens.myshopify.com"
-const domain = "packon-loja.myshopify.com"; 
-
-// 2. COLOQUE O TOKEN DIRETAMENTE AQUI
-// O token correto do Storefront GERALMENTE NÃO começa com "shpat_"
-const storefrontAccessToken = "55073988932b2d76f69be99f047c8853";
+if (!domain || !storefrontAccessToken) {
+  throw new Error('⚠️ Faltam variáveis de ambiente da Shopify (.env.local)');
+}
 
 async function ShopifyData(query: string, variables = {}) {
   const URL = `https://${domain}/api/2024-01/graphql.json`;
@@ -473,4 +470,100 @@ export async function updateLinesInCart(cartId: string, lines: { id: string; qua
   const variables = { cartId, lines };
   const response = await ShopifyData(query, variables);
   return response.data.cartLinesUpdate.cart;
+}
+
+// src/lib/shopify.ts (Adicione/Atualize esta função)
+
+// ... imports e configs anteriores
+
+export async function getCollectionProducts(collectionHandle: string, sortKey = "CREATED", reverse = false) {
+  const query = `
+  {
+    collectionByHandle(handle: "${collectionHandle}") {
+      title
+      products(first: 100, sortKey: ${sortKey}, reverse: ${reverse}) {
+        edges {
+          node {
+            id
+            title
+            handle
+            productType 
+            availableForSale
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+            images(first: 1) {
+              edges {
+                node {
+                  url
+                  altText
+                }
+              }
+            }
+            variants(first: 1) {
+              edges {
+                node {
+                  id
+                  availableForSale
+                  selectedOptions {
+                     name
+                     value
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`;
+
+  const response = await ShopifyData(query);
+  return response.data.collectionByHandle?.products.edges || [];
+}
+
+// src/lib/shopify.ts
+
+// ... suas outras funções ...
+
+// 4. Buscar produtos por termo (Search)
+export async function searchProducts(term: string) {
+  // A query busca produtos onde o título contém o termo
+  const query = `
+  {
+    products(first: 5, query: "title:${term}*") {
+      edges {
+        node {
+          id
+          title
+          handle
+          images(first: 1) {
+            edges {
+              node {
+                url
+                altText
+              }
+            }
+          }
+          priceRange {
+            minVariantPrice {
+              amount
+              currencyCode
+            }
+          }
+        }
+      }
+    }
+  }`;
+
+  try {
+    const response = await ShopifyData(query);
+    return response.data.products.edges;
+  } catch (error) {
+    console.error("Erro na busca:", error);
+    return [];
+  }
 }

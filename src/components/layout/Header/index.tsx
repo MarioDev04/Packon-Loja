@@ -9,6 +9,8 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useCartStore } from "@/store/cartStore";
 import CartContent from "./CartContent";
+import SearchBox from "./SearchBox";
+import MobileSearchResults from "./MobileSearchResults";
 
 export default function Header() {
   const headerRef = useRef<HTMLElement>(null);
@@ -188,10 +190,7 @@ const totalItems = cart?.lines?.edges?.length || 0;
 
           {/* Desktop Actions */}
           <div className={styles.desktopActions}>
-            <div className={styles.searchContainer}>
-              <input type="text" className={styles.searchInput} placeholder="Buscar..." />
-              <button className={styles.iconButton}><Search size={18} color="#a1a1a1" /></button>
-            </div>
+            <SearchBox />
             <button className={styles.cartButton} onClick={handleCartClick}>
               <ShoppingCart className={styles.cartIcon} size={26} />
               {totalItems > 0 && <span className={styles.badge}>{totalItems}</span>}
@@ -216,10 +215,26 @@ const totalItems = cart?.lines?.edges?.length || 0;
           
           {/* TELA 1: MENU DE LINKS + BUSCA */}
           <div className={styles.mobileNavWrapper} ref={mobileMenuRef}>
-             <div className={styles.mobileSearch}>
-                <Search size={20} color="#fff" />
-                <input type="text" placeholder="O que você procura?" />
-             </div>
+             <div className={styles.mobileNavWrapper} ref={mobileMenuRef}>
+
+    {/* Container da Busca */}
+    <div className={styles.mobileSearchSection}>
+        {/* O Input de Busca (Reutilizando o SearchBox) */}
+        <SearchBox isMobile={true} />
+
+        {/* AQUI ESTÁ A MUDANÇA: Os resultados aparecem aqui, empurrando o resto */}
+        <MobileSearchResults onLinkClick={toggleMobileMenu} />
+    </div>
+
+    {/* Botão Carrinho (continua aqui, será empurrado para baixo se tiver resultados) */}
+    <button className={styles.mobileCartBtn} onClick={() => switchMobileView('cart')}>
+       {/* ... */}
+    </button>
+
+    {/* ... Nav Links ... */}
+</div>
+
+             
 
              {/* Botão que chama a TELA 2 (Carrinho) */}
              <button className={styles.mobileCartBtn} onClick={() => switchMobileView('cart')}>

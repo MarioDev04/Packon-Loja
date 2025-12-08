@@ -1,0 +1,342 @@
+/* src/components/catalog/catalog.module.css */
+
+.pageContainer {
+  background-color: #020202;
+  min-height: 100vh;
+  padding-top: 200px; /* Espaço para o Header */
+  padding-bottom: 4rem;
+  color: white;
+}
+
+.contentWrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 280px 1fr; /* Sidebar fixa e Grid fluido */
+  gap: 3rem;
+  align-items: start;
+}
+
+/* --- SIDEBAR (FILTROS) --- */
+.sidebar {
+  position: sticky;
+  top: 120px; /* Fica fixo ao rolar */
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.filterTitle {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+/* src/components/catalog/catalog.module.css */
+
+/* ... (Mantenha o resto do CSS anterior: pageContainer, contentWrapper, sidebar, etc.) ... */
+
+/* --- CUSTOM SELECT (Efeito Expansão Header-like) --- */
+.customSelectPlaceholder {
+  /* Reserva o espaço na sidebar para o botão não pular */
+  width: 100%;
+  height: 50px; /* Altura aproximada do botão fechado */
+  position: relative;
+  z-index: 50;
+}
+
+.expandingBox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  border-radius: 25px; /* Bem arredondado fechado */
+  overflow: hidden;
+  box-shadow: 0 0 0 rgba(0,0,0,0); /* Sombra suave ao abrir */
+  
+  /* A altura será animada pelo GSAP */
+  height: 50px;
+  
+  display: flex;
+  flex-direction: column;
+}
+
+.selectTrigger {
+  width: 100%;
+  height: 50px; /* Altura fixa do cabeçalho */
+  padding: 0 1.5rem;
+  background: transparent;
+  color: black;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0; /* Garante que o cabeçalho não encolha */
+}
+
+.optionsList {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  opacity: 0; /* Começa invisível para o efeito de fade-in */
+  /* Padding embaixo para ficar bonito aberto */
+  padding-bottom: 0.5rem; 
+}
+
+.optionItem {
+  width: 100%;
+  padding: 0.8rem 1.5rem;
+  background: transparent;
+  color: #333;
+  border: none;
+  text-align: left;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.optionItem:hover {
+  background: #f5f5f5;
+}
+
+.optionSelected {
+  background: #f0f0f0;
+  font-weight: 600;
+  color: black;
+}
+
+/* Tipos de Embalagem (Pills) */
+.typesList{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.typeButton {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.7);
+  padding: 0.8rem 1.5rem;
+  border-radius: 99px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  white-space: nowrap;
+}
+
+
+
+.typeButton:hover {
+  border-color: white;
+  color: white;
+}
+
+.typeButtonActive {
+  background: white;
+  color: black;
+  border-color: white;
+  font-weight: 500;
+}
+
+/* Preço (Range Slider Customizado) */
+.priceFilterContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.priceLabelMin {
+  font-size: 1rem;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* O Input Mágico */
+.rangeInput {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px; /* Altura do trilho */
+  
+  /* 1. O Trilho é transparente com borda branca */
+  background-color: transparent;
+  border: 1px solid #ffffff;
+  border-radius: 99px;
+  
+  outline: none;
+  cursor: pointer;
+  
+  /* 2. O Preenchimento será injetado via inline-style no React (linear-gradient) */
+  /* background-image: gerado dinamicamente no TSX */
+  background-repeat: no-repeat;
+}
+
+/* A Bolinha (Thumb) */
+.rangeInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  
+  /* Centraliza a bolinha no trilho */
+  margin-top: 0px; 
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  transition: transform 0.1s;
+}
+
+.rangeInput::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Compatibilidade Firefox */
+.rangeInput::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+}
+
+/* Botão Filtrar */
+.filterButton {
+  margin-top: 1rem;
+  background: #ccc; /* Cinza claro como na imagem */
+  color: black;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 99px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 1rem;
+}
+.filterButton:hover {
+  background: white;
+}
+
+/* --- GRID DE PRODUTOS --- */
+.productsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 Colunas como na imagem */
+  gap: 2rem;
+}
+
+.card {
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Borda fina */
+  border-radius: 30px;
+  padding: 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  transition: border-color 0.3s;
+}
+
+.card:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  margin-bottom: 1rem;
+}
+
+.productImage {
+  object-fit: contain;
+  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+}
+
+.info {
+  text-align: center;
+  width: 100%;
+}
+
+.productTitle {
+  font-size: 1.4rem;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.productPrice {
+  font-size: 1.3rem;
+  font-weight: 300;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.buyButton {
+  background: #e0e0e0;
+  color: black;
+  border: none;
+  padding: 0.7rem 3rem;
+  border-radius: 99px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 100%;
+  max-width: 200px;
+}
+
+.buyButton:hover {
+  background: white;
+  transform: scale(1.05);
+}
+
+.noResults {
+  grid-column: span 3;
+  text-align: center;
+  padding: 4rem;
+  color: #888;
+  font-size: 1.2rem;
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 1024px) {
+  .contentWrapper {
+    grid-template-columns: 1fr; /* Coluna única */
+  }
+  
+  .sidebar {
+    position: relative;
+    top: 0;
+    margin-bottom: 3rem;
+  }
+  
+  .productsGrid {
+    grid-template-columns: repeat(2, 1fr); /* 2 Colunas */
+  }
+}
+
+@media (max-width: 600px) {
+  .productsGrid {
+    grid-template-columns: 1fr; /* 1 Coluna */
+  }
+  
+  .filterGroup {
+    /* No mobile, podemos fazer os filtros scrollarem horizontalmente se quiser */
+  }
+}
