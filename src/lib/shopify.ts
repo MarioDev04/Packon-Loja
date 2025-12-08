@@ -7,12 +7,6 @@ if (!domain || !storefrontAccessToken) {
 
 async function ShopifyData(query: string, variables = {}) {
   const URL = `https://${domain}/api/2024-01/graphql.json`;
-
-  // Vamos ver no terminal exatamente o que está sendo montado
-  console.log("--- DEBUG SHOPIFY ---");
-  console.log("Tentando conectar em:", URL);
-  console.log("Usando Token (inicio):", storefrontAccessToken.substring(0, 5) + "...");
-
   const options = {
     endpoint: URL,
     method: "POST",
@@ -567,3 +561,4 @@ export async function searchProducts(term: string) {
     return [];
   }
 }
+

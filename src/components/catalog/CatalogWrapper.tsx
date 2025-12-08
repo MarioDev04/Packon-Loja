@@ -1,14 +1,15 @@
 // src/components/catalog/CatalogWrapper.tsx
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./catalog.module.css";
 import { formatPrice } from "@/utils/format";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import CustomSelect from "./CustomSelect"; // Certifique-se de que este arquivo existe na mesma pasta
+import CustomSelect from "./CustomSelect";
+import { Filter, X } from "lucide-react";
 
 interface CatalogWrapperProps {
   initialProducts: any[];
@@ -16,16 +17,19 @@ interface CatalogWrapperProps {
 
 export default function CatalogWrapper({ initialProducts }: CatalogWrapperProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const filterRef = useRef<HTMLElement>(null);
+  // Ref para controlar o debounce do preço sem causar re-renders
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // --- ESTADOS ---
   const [selectedType, setSelectedType] = useState<string>("Todos");
   const [maxPrice, setMaxPrice] = useState<number>(1000);
   const [sortOption, setSortOption] = useState<string>("recent");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   
-  // Lista de produtos filtrados que será exibida
   const [filteredProducts, setFilteredProducts] = useState(initialProducts);
 
-  // --- 1. Extração Dinâmica de Tipos de Embalagem ---
+  // --- 1. Extração Dinâmica de Tipos ---
   const availableTypes = useMemo(() => {
     const types = new Set<string>();
     initialProducts.forEach(({ node }) => {
@@ -33,33 +37,30 @@ export default function CatalogWrapper({ initialProducts }: CatalogWrapperProps)
         types.add(node.productType);
       }
     });
-    // Garante que "Todos" seja sempre a primeira opção
     return ["Todos", ...Array.from(types)];
   }, [initialProducts]);
 
-  // --- 2. Cálculo do Preço Máximo Real (Para o Slider) ---
+  // --- 2. Cálculo do Preço Máximo Inicial ---
   const limitPrice = useMemo(() => {
     let max = 0;
     initialProducts.forEach(({ node }) => {
       const price = parseFloat(node.priceRange.minVariantPrice.amount);
       if (price > max) max = price;
     });
-    // Se não tiver preço, define um padrão de 100 só para não quebrar
     return Math.ceil(max) || 100;
   }, [initialProducts]);
   
-  // Atualiza o filtro de preço inicial para o máximo possível ao carregar
+  // Seta o preço máximo apenas na montagem inicial para não travar o slider
   useEffect(() => { 
-    setMaxPrice(limitPrice); 
+    if (maxPrice === 1000 && limitPrice !== 1000) {
+        setMaxPrice(limitPrice); 
+    }
   }, [limitPrice]);
 
-  // --- 3. Cálculo da Porcentagem para o Slider (Visual) ---
-  // Isso cria o efeito da barra branca preenchendo a barra transparente
   const progressPercent = limitPrice > 0 ? (maxPrice / limitPrice) * 100 : 0;
 
-  // --- LÓGICA DE FILTRAGEM E ORDENAÇÃO ---
-  const handleFilter = () => {
-    // 1. Filtra
+  // --- LÓGICA DE FILTRAGEM (CENTRALIZADA) ---
+  const filterProducts = useCallback(() => {
     let result = initialProducts.filter(({ node }) => {
       const price = parseFloat(node.priceRange.minVariantPrice.amount);
       
@@ -69,7 +70,6 @@ export default function CatalogWrapper({ initialProducts }: CatalogWrapperProps)
       return matchesType && matchesPrice;
     });
 
-    // 2. Ordena
     if (sortOption === "price_asc") {
       result.sort((a, b) => 
         parseFloat(a.node.priceRange.minVariantPrice.amount) - parseFloat(b.node.priceRange.minVariantPrice.amount)
@@ -79,32 +79,48 @@ export default function CatalogWrapper({ initialProducts }: CatalogWrapperProps)
         parseFloat(b.node.priceRange.minVariantPrice.amount) - parseFloat(a.node.priceRange.minVariantPrice.amount)
       );
     }
-    // "recent" mantém a ordem original do array (que veio do Shopify)
 
-    // 3. Animação de Saída dos Cards Antigos -> Atualização -> Entrada dos Novos
+    // Animação de saída antes de trocar os dados
     const cards = document.querySelectorAll(`.${styles.card}`);
     
     if (cards.length > 0) {
       gsap.to(cards, {
         opacity: 0,
-        y: 20,
-        duration: 0.3,
+        y: 10,
+        duration: 0.2,
         ease: "power2.in",
         onComplete: () => {
-          setFilteredProducts(result);
-          // O useGSAP abaixo detectará a mudança no filteredProducts e fará a entrada
+          setFilteredProducts([...result]); // Atualiza o estado
+          // A animação de entrada roda automaticamente pelo useGSAP abaixo
         }
       });
     } else {
-      // Se não tinha cards (estava vazio), apenas atualiza
-      setFilteredProducts(result);
+      setFilteredProducts([...result]);
     }
-  };
+  }, [initialProducts, maxPrice, selectedType, sortOption]);
 
-  // --- ANIMAÇÃO DE ENTRADA (Sempre que a lista muda) ---
+  // --- EFEITO REATIVO (AUTOMÁTICO) ---
+  useEffect(() => {
+    // Se houver um timeout pendente (usuário ainda arrastando slider), cancela
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    // Pequeno delay (debounce) para não animar excessivamente enquanto arrasta o preço
+    timeoutRef.current = setTimeout(() => {
+        filterProducts();
+    }, 300); // 300ms de espera
+
+    return () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [selectedType, maxPrice, sortOption, filterProducts]);
+
+
+  // --- ANIMAÇÃO DE ENTRADA (Sempre que filteredProducts mudar) ---
   useGSAP(() => {
-    gsap.fromTo(`.${styles.card}`, 
-      { opacity: 0, y: 30 },
+    // Garante que os elementos estejam invisíveis antes de animar entrada
+    gsap.set(`.${styles.card}`, { opacity: 0, y: 30 });
+
+    gsap.to(`.${styles.card}`, 
       { 
         opacity: 1, 
         y: 0, 
@@ -116,7 +132,31 @@ export default function CatalogWrapper({ initialProducts }: CatalogWrapperProps)
     );
   }, { scope: containerRef, dependencies: [filteredProducts] });
 
-  // Opções para o Select Customizado
+  // --- ANIMAÇÃO DO MENU MOBILE ---
+  useGSAP(() => {
+    if (window.innerWidth <= 1024 && filterRef.current) {
+      if (showMobileFilters) {
+        gsap.to(filterRef.current, { 
+          height: "auto", 
+          opacity: 1, 
+          paddingBottom: "2rem",
+          duration: 0.4, 
+          ease: "power2.out",
+          display: "flex"
+        });
+      } else {
+        gsap.to(filterRef.current, { 
+          height: 0, 
+          opacity: 0, 
+          paddingBottom: 0,
+          duration: 0.3, 
+          ease: "power2.in",
+          display: "none"
+        });
+      }
+    }
+  }, { dependencies: [showMobileFilters] });
+
   const sortOptions = [
     { label: "Mais recentes", value: "recent" },
     { label: "Menor preço", value: "price_asc" },
@@ -126,13 +166,22 @@ export default function CatalogWrapper({ initialProducts }: CatalogWrapperProps)
   return (
     <div className={styles.contentWrapper} ref={containerRef}>
       
+      {/* --- BOTÃO MOBILE PARA ABRIR FILTROS --- */}
+      <div className={styles.mobileFilterHeader}>
+        <button 
+          className={styles.mobileFilterBtn} 
+          onClick={() => setShowMobileFilters(!showMobileFilters)}
+        >
+          {showMobileFilters ? <X size={20}/> : <Filter size={20}/>}
+          <span>{showMobileFilters ? "Fechar Filtros" : "Filtrar e Ordenar"}</span>
+        </button>
+      </div>
+
       {/* --- SIDEBAR (FILTROS) --- */}
-      <aside className={styles.sidebar}>
+      <aside className={styles.sidebar} ref={filterRef}>
         
-        {/* 1. ORDENAR POR (Select Customizado que Expande) */}
         <div className={styles.filterGroup}>
           <label className={styles.filterTitle}>Ordenar por:</label>
-          {/* Componente que criamos anteriormente */}
           <CustomSelect 
             options={sortOptions} 
             value={sortOption} 
@@ -140,7 +189,6 @@ export default function CatalogWrapper({ initialProducts }: CatalogWrapperProps)
           />
         </div>
 
-        {/* 2. TIPOS DE EMBALAGEM (Botões Pills) */}
         <div className={styles.filterGroup}>
           <label className={styles.filterTitle}>Tipos de embalagem:</label>
           <div className={styles.typesList}>
@@ -156,16 +204,14 @@ export default function CatalogWrapper({ initialProducts }: CatalogWrapperProps)
           </div>
         </div>
 
-        {/* 3. PREÇO (Slider Customizado Transparente/Branco) */}
         <div className={styles.filterGroup}>
           <div className={styles.priceHeader}>
-             <label className={styles.filterTitle}>Preço:</label>
+             <label className={styles.filterTitle}>Preço Máximo:</label>
           </div>
           
           <div className={styles.priceFilterContainer}>
              <span className={styles.priceLabelMin}>{formatPrice(maxPrice.toString())}</span>
              
-             {/* INPUT RANGE CUSTOMIZADO */}
              <input 
                 type="range" 
                 min="0" 
@@ -174,19 +220,13 @@ export default function CatalogWrapper({ initialProducts }: CatalogWrapperProps)
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
                 className={styles.rangeInput}
                 style={{
-                  // CRUCIAL: Isso cria o preenchimento branco dinâmico
-                  backgroundImage: `linear-gradient(to right, #ffffff ${progressPercent}%, transparent ${progressPercent}%)`
+                  backgroundImage: `linear-gradient(to right, #ffffff ${progressPercent}%, rgba(255,255,255,0.2) ${progressPercent}%)`
                 }}
              />
-             
-             {/* Opcional: Mostra o valor máximo ao lado se quiser, ou deixa só a label abaixo */}
           </div>
         </div>
 
-        {/* 4. BOTÃO DE AÇÃO (Filtra de verdade) */}
-        <button className={styles.filterButton} onClick={handleFilter}>
-          Filtrar
-        </button>
+        {/* REMOVIDO O BOTÃO "APLICAR FILTROS" DAQUI */}
 
       </aside>
 
@@ -200,14 +240,13 @@ export default function CatalogWrapper({ initialProducts }: CatalogWrapperProps)
              return (
                <Link href={`/produtos/${node.handle}`} key={node.id} className={styles.card}>
                  
-                 {/* Imagem do Produto */}
                  <div className={styles.imageWrapper}>
                    {image ? (
                      <Image 
                        src={image.url} 
                        alt={image.altText || node.title}
                        fill
-                       sizes="(max-width: 768px) 100vw, 33vw"
+                       sizes="(max-width: 768px) 50vw, 33vw"
                        className={styles.productImage}
                      />
                    ) : (
@@ -215,14 +254,13 @@ export default function CatalogWrapper({ initialProducts }: CatalogWrapperProps)
                    )}
                  </div>
                  
-                 {/* Informações */}
                  <div className={styles.info}>
                     <h3 className={styles.productTitle}>{node.title}</h3>
                     <p className={styles.productPrice}>
                       {formatPrice(price.amount, price.currencyCode)}
                     </p>
                     <button className={styles.buyButton}>
-                      Comprar
+                      Ver detalhes
                     </button>
                  </div>
                </Link>

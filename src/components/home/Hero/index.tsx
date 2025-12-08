@@ -159,7 +159,7 @@ export default function Hero() {
     <section className={styles.heroSection} ref={containerRef}>
       <div className={styles.content}>
         <h1 className={styles.title} ref={titleRef}>
-          A embalagem que vende<br />por você.
+          A embalagem que vende por você.
         </h1>
         <p className={styles.subtitle} ref={subtitleRef}>
           Embale com propósito: mais presença, mais valor percebido e mais vendas.

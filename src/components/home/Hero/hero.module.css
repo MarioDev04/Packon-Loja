@@ -39,6 +39,7 @@
   background: linear-gradient(180deg, #fff 0%, #ccc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  max-width: 1000px;
 }
 
 .subtitle {
@@ -147,7 +148,7 @@
     justify-content: center; 
     
     /* 2. Padding de segurança apenas para passar do Header (80px) */
-    padding-top: 170px;
+    padding-top: 5rem;
     padding-bottom: 2rem; /* Respiro embaixo */
   }
 

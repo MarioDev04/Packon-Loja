@@ -17,7 +17,7 @@
 .listContainer {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
   width: 100%;
 }
 
@@ -99,9 +99,10 @@
 
 .colPrice {
   flex: 1;
-  text-align: center;
-  font-size: 0.95rem;
+  text-align: left;
+  font-size: 1.1rem;
   color: #fff;
+  font-weight: 300;
 }
 
 .trashBtn {
@@ -176,5 +177,8 @@
 @media (max-width: 1024px) {
   .row { flex-wrap: wrap; }
   .stepper { width: 100px; }
-  .colInfo { display: none; } /* Simplifica no mobile se aparecer */
+  .colInfo { display: none; }
+  .footer {
+  flex-direction: column;
+} /* Simplifica no mobile se aparecer */
 }

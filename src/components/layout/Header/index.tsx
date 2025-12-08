@@ -11,6 +11,7 @@ import { useCartStore } from "@/store/cartStore";
 import CartContent from "./CartContent";
 import SearchBox from "./SearchBox";
 import MobileSearchResults from "./MobileSearchResults";
+import TransitionLink from "@/components/ui/TransitionLink";
 
 export default function Header() {
   const headerRef = useRef<HTMLElement>(null);
@@ -174,18 +175,20 @@ const totalItems = cart?.lines?.edges?.length || 0;
     <header className={styles.header} ref={headerRef}>
       
       <div className={styles.navBar}>
-          <Link href="/" className={styles.logoLink}>
+          <TransitionLink href="/" className={styles.logoLink}>
             <div className={styles.logoWrapper}>
               <Image src="/logo.png" alt="Packon" fill priority sizes="120px" style={{ objectFit: 'contain' }} />
             </div>
-          </Link>
+          </TransitionLink>
 
           {/* Desktop Nav */}
           <nav className={styles.desktopNav}>
-            <Link href="/" className={styles.navLink}>Início</Link>
-            <Link href="/produtos" className={styles.navLink}>Loja</Link>
-            <Link href="/quem-somos" className={styles.navLink}>Quem somos</Link>
-            <Link href="/contato" className={styles.navLink}>Contato</Link>
+<nav className={styles.desktopNav}>
+  <TransitionLink href="/" className={styles.navLink}>Início</TransitionLink>
+  <TransitionLink href="/produtos" className={styles.navLink}>Catalogo</TransitionLink>
+  <TransitionLink href="/quem-somos" className={styles.navLink}>Quem somos</TransitionLink>
+  <TransitionLink href="/contato" className={styles.navLink}>Contato</TransitionLink>
+</nav>
           </nav>
 
           {/* Desktop Actions */}
@@ -243,10 +246,10 @@ const totalItems = cart?.lines?.edges?.length || 0;
              </button>
 
              <nav className={styles.mobileNav}>
-               <Link href="/" className={styles.mobileNavLink} onClick={toggleMobileMenu}>Início</Link>
-               <Link href="/produtos" className={styles.mobileNavLink} onClick={toggleMobileMenu}>Produtos</Link>
-               <Link href="/quem-somos" className={styles.mobileNavLink} onClick={toggleMobileMenu}>Quem somos</Link>
-               <Link href="/contato" className={styles.mobileNavLink} onClick={toggleMobileMenu}>Contato</Link>
+               <TransitionLink href="/" className={styles.mobileNavLink} onClick={toggleMobileMenu}>Início</TransitionLink>
+               <TransitionLink href="/produtos" className={styles.mobileNavLink} onClick={toggleMobileMenu}>Catalogo</TransitionLink>
+               <TransitionLink href="/quem-somos" className={styles.mobileNavLink} onClick={toggleMobileMenu}>Quem somos</TransitionLink>
+               <TransitionLink href="/contato" className={styles.mobileNavLink} onClick={toggleMobileMenu}>Contato</TransitionLink>
              </nav>
           </div>
 
