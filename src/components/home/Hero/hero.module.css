@@ -16,7 +16,7 @@
   justify-content: center; 
   
   overflow: hidden;
-  padding-top: 120px; 
+  padding-top: 80px; 
 }
 
 .content {
@@ -148,7 +148,7 @@
     justify-content: center; 
     
     /* 2. Padding de segurança apenas para passar do Header (80px) */
-    padding-top: 5rem;
+    padding-top: 8rem;
     padding-bottom: 2rem; /* Respiro embaixo */
   }
 
